@@ -40,6 +40,14 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
+    implementation(project(":data-retrofit"))
+    implementation(project(":domain"))
+
+    // Retrofit
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.retrofit)
+    implementation(libs.kotlinx.serialization.json)
+
     //hilt
     implementation (libs.hilt.android)
     ksp(libs.hilt.android.compiler)

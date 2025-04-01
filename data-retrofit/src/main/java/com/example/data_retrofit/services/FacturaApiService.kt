@@ -1,6 +1,7 @@
 package com.example.data_retrofit.services
 
-import com.example.domain.Factura
+import com.example.domain.factura_response.FacturaResponse
+import retrofit2.Response
 import retrofit2.http.GET
 
 /**
@@ -11,5 +12,5 @@ interface FacturaApiService {
      * Realiza una petición a la api para obtener todos los datos de las facturas disponibles.
      */
     @GET("facturas")
-    suspend fun getFacturas() : List<Factura>
+    suspend fun getFacturas() : Response<FacturaResponse>
 }

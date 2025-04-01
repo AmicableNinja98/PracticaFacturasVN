@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.example.domain.Factura
+import com.example.domain.factura.Factura
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -25,4 +25,7 @@ interface FacturaDao {
 
     @Query("SELECT * FROM Factura WHERE id = :id")
     suspend fun getFacturaById(id : Int) : Factura?
+
+    @Query("SELECT MAX(id) FROM Factura")
+    suspend fun getLastFacturaId() : Int
 }

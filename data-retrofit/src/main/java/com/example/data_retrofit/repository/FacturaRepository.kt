@@ -2,7 +2,7 @@ package com.example.data_retrofit.repository
 
 import com.example.data_retrofit.database.FacturaDao
 import com.example.data_retrofit.services.FacturaApiService
-import com.example.domain.Factura
+import com.example.domain.factura.Factura
 import javax.inject.Inject
 
 /**
@@ -25,7 +25,10 @@ class FacturaRepository @Inject constructor(private val facturaApiService: Factu
      * Inserta una factura en la base de datos.
      * @param factura -> Factura a insertar.
      */
-    suspend fun insertFactura(factura: Factura) = facturaDao.insertFactura(factura)
+    suspend fun insertFactura(factura: Factura){
+        factura.id = getLastFacturaId()
+        facturaDao.insertFactura(factura)
+    }
 
     /**
      * Elimina una factura en la base de datos.
@@ -44,4 +47,9 @@ class FacturaRepository @Inject constructor(private val facturaApiService: Factu
      * @param id -> Id de la factura a recoger.
      */
     suspend fun getFacturaById(id : Int) = facturaDao.getFacturaById(id)
+
+    /**
+     * Recoge el último id de una factura registrado en la base de datos.
+     */
+    suspend fun getLastFacturaId() = facturaDao.getLastFacturaId()
 }

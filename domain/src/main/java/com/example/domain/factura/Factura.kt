@@ -1,4 +1,4 @@
-package com.example.domain
+package com.example.domain.factura
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
