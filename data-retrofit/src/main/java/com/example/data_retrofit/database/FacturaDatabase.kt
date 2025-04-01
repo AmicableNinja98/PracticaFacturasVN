@@ -12,7 +12,7 @@ import com.example.domain.Factura
     exportSchema = false
 )
 abstract class FacturaDatabase() : RoomDatabase(){
-    abstract fun facturaDao() : FacturaDao
+    abstract fun getFacturaDao() : FacturaDao
 
     companion object{
         @Volatile

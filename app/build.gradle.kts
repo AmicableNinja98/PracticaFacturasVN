@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp")
+    alias(libs.plugins.hilt.application)
 }
 
 android {
@@ -49,6 +51,25 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+
+    //Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    // Retrofit
+    implementation(libs.retrofit2.kotlinx.serialization.converter)
+    implementation(libs.retrofit)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.coil.compose)
+
+    //hilt
+    implementation (libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation (libs.hilt.navigation.compose)
+
+    //Navigation
+    implementation(libs.androidx.navigation.compose)
 
     implementation(project(":core"))
     implementation(project(":data-retrofit"))

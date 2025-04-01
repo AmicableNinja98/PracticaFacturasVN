@@ -3,13 +3,14 @@ package com.example.data_retrofit.repository
 import com.example.data_retrofit.database.FacturaDao
 import com.example.data_retrofit.services.FacturaApiService
 import com.example.domain.Factura
+import javax.inject.Inject
 
 /**
  * Repositorio que se encarga de enlazar los viewModel de la entidad Factura con la api y la base de datos local.
  * @param facturaApiService -> Api a usar para recoger los datos.
  * @param facturaDao -> Dao que usaremos para guardar los datos recogidos de la api en la base de datos local.
  */
-class FacturaRepository(private val facturaApiService: FacturaApiService,private val facturaDao: FacturaDao) {
+class FacturaRepository @Inject constructor(private val facturaApiService: FacturaApiService,private val facturaDao: FacturaDao) {
     /**
      * Recoge las facturas de la api.
      */

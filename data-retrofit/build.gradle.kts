@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp")
+    alias(libs.plugins.hilt.application)
 }
 
 android {
@@ -37,13 +38,17 @@ dependencies {
     // Retrofit
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit)
-    implementation(libs.coil.compose)
     implementation(libs.kotlinx.serialization.json)
 
     //Room
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+
+    //hilt
+    implementation (libs.hilt.android)
+    ksp(libs.hilt.android.compiler)
+    implementation (libs.hilt.navigation.compose)
 
     implementation(project(":domain"))
 
