@@ -71,6 +71,9 @@ dependencies {
     //Navigation
     implementation(libs.androidx.navigation.compose)
 
+    //Retromock
+    implementation (libs.retromock)
+
     implementation(project(":core"))
     implementation(project(":data-retrofit"))
     implementation(project(":domain"))

@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     id("com.google.devtools.ksp")
     alias(libs.plugins.hilt.application)
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.10"
 }
 
 android {
@@ -39,6 +40,7 @@ dependencies {
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
+    implementation (libs.converter.scalars)
 
     //Room
     implementation(libs.androidx.room.runtime)
@@ -49,6 +51,9 @@ dependencies {
     implementation (libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation (libs.hilt.navigation.compose)
+
+    //Retromock
+    implementation (libs.retromock)
 
     implementation(project(":domain"))
 

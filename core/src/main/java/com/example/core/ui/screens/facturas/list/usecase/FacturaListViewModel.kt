@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data_retrofit.repository.FacturaRepository
+import com.example.domain.factura.Factura
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +21,7 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
     }
 
     private fun getFacturas(){
-        viewModelScope.launch {
+        /*viewModelScope.launch {
             state = FacturaListState.Loading
             facturaRepository.getFacturasFromDatabase().collect {
                 facturas ->
@@ -29,6 +30,16 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
                 else
                     FacturaListState.Success(facturas)
             }
-        }
+        }*/
+        state = FacturaListState.Success(
+            listOf(
+                Factura(
+                    1,"Pendiente de pago",1.56,"07/02/2019"
+                ),
+                Factura(
+                    2,"Pagada",25.14,"05/02/2019"
+                )
+            )
+        )
     }
 }

@@ -4,21 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.sqlite.db.SupportSQLiteDatabase
-import com.example.data_retrofit.repository.FacturaRepository
 import com.example.domain.factura.Factura
-import kotlinx.coroutines.runBlocking
-import java.util.concurrent.Executors
-import javax.inject.Inject
 
 @Database(
     entities = [Factura::class],
     version = 1,
     exportSchema = false
 )
-abstract class FacturaDatabase @Inject constructor(private val facturaRepository: FacturaRepository) : RoomDatabase(){
+abstract class FacturaDatabase : RoomDatabase(){
     abstract fun getFacturaDao() : FacturaDao
-
     companion object{
         @Volatile
         private var INSTANCE : FacturaDatabase? = null
@@ -29,26 +23,16 @@ abstract class FacturaDatabase @Inject constructor(private val facturaRepository
                     context.applicationContext,
                     FacturaDatabase::class.java,
                     "factura_database.db"
-                )
-                    .addCallback(object : RoomDatabase.Callback(){
-                        override fun onCreate(db : SupportSQLiteDatabase){
-                            super.onCreate(db)
-                            Executors.newSingleThreadExecutor().execute {
-                                INSTANCE?.let {
-                                    database -> prepoulateDatabase(database)
-                                }
-                            }
-                        }
-                    }).build()
+                ).build()
                 INSTANCE = instance
                 instance
             }
         }
 
-        private fun prepoulateDatabase(facturaDatabase: FacturaDatabase){
+        /*private fun prepoulateDatabase(facturaDatabase: FacturaDatabase){
             val facturaDao = facturaDatabase.getFacturaDao()
             runBlocking {
-                val response = facturaDatabase.facturaRepository.getFacturasFromApi()
+                val response = facturaDatabase.getApiService().getFacturas()
                 var id = 0
                 if(response.isSuccessful){
                     val body = response.body()
@@ -59,6 +43,6 @@ abstract class FacturaDatabase @Inject constructor(private val facturaRepository
                         }
                 }
             }
-        }
+        }*/
     }
 }

@@ -1,16 +1,17 @@
 package com.example.practicafacturas.inject
 
 import android.content.Context
+import co.infinum.retromock.Retromock
 import com.example.data_retrofit.database.FacturaDao
 import com.example.data_retrofit.database.FacturaDatabase
+import com.example.data_retrofit.services.CustomKotlinSerializationConverter
 import com.example.data_retrofit.services.FacturaApiService
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.example.data_retrofit.services.RetromockService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.serialization.json.Json
-import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -21,6 +22,9 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
     const val BASE_URL = "https://viewnextandroid.wiremockapi.cloud/"
+    /*val json = Json {
+        ignoreUnknownKeys = true
+    }*/
 
     /**
      * Inyecta una instancia de retrofit para usar en la aplicación.
@@ -29,7 +33,13 @@ object AppModule {
     @Singleton
     fun provideRetrofit(): Retrofit = Retrofit.Builder()
         .baseUrl(BASE_URL)
-        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+        .addConverterFactory(CustomKotlinSerializationConverter())
+        .build()
+
+    @Provides
+    @Singleton
+    fun provideRetroMock(retrofit: Retrofit): Retromock = Retromock.Builder()
+        .retrofit(retrofit)
         .build()
 
     /**
@@ -42,12 +52,19 @@ object AppModule {
         FacturaApiService::class.java
     )
 
+    @Provides
+    @Singleton
+    fun provideRetromockService(retromock: Retromock): RetromockService = retromock.create(
+        RetromockService::class.java
+    )
+
     /**
      * Inyecta la base de datos para usar en la aplicación.
      */
     @Provides
     @Singleton
-    fun provideDatabase(context: Context) : FacturaDatabase = FacturaDatabase.getDatabase(context)
+    fun provideDatabase(@ApplicationContext context: Context): FacturaDatabase =
+        FacturaDatabase.getDatabase(context)
 
     /**
      * Inyecta el dao para que el repositorio pueda usarlo.
@@ -55,5 +72,6 @@ object AppModule {
      */
     @Provides
     @Singleton
-    fun provideFacturaDao(facturaDatabase: FacturaDatabase) : FacturaDao = facturaDatabase.getFacturaDao()
+    fun provideFacturaDao(facturaDatabase: FacturaDatabase): FacturaDao =
+        facturaDatabase.getFacturaDao()
 }
