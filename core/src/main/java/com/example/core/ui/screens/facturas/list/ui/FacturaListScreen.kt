@@ -39,17 +39,17 @@ import com.example.core.R
 import com.example.domain.factura.Factura
 
 @Composable
-fun FacturaListScreenHost(viewModel: FacturaListViewModel) {
+fun FacturaListScreenHost(viewModel: FacturaListViewModel,goToFilter : () -> Unit) {
     when (viewModel.state) {
         is FacturaListState.Loading -> {}
-        is FacturaListState.Success -> FacturaListScreen((viewModel.state as FacturaListState.Success).facturas)
+        is FacturaListState.Success -> FacturaListScreen((viewModel.state as FacturaListState.Success).facturas,goToFilter)
         is FacturaListState.NoData -> {}
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacturaListScreen(facturas: List<Factura>) {
+fun FacturaListScreen(facturas: List<Factura>,goToFilter: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -71,7 +71,7 @@ fun FacturaListScreen(facturas: List<Factura>) {
                 },
                 actions = {
                     IconButton(
-                        onClick = {}
+                        onClick = goToFilter
                     ) {
                         Icon(painter = painterResource(R.drawable.baseline_filter_alt_24),contentDescription = null)
                     }
