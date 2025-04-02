@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.core.ui.screens.facturas.list.ui.FacturaListFilterScreen
 import com.example.core.ui.screens.facturas.list.ui.FacturaListScreenHost
 import com.example.core.ui.screens.facturas.list.usecase.FacturaListViewModel
 import com.example.practicafacturas.theme.PracticaFacturasTheme
@@ -17,7 +18,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PracticaFacturasTheme {
-                FacturaListScreenHost(hiltViewModel<FacturaListViewModel>())
+                //FacturaListScreenHost(hiltViewModel<FacturaListViewModel>())
+                FacturaListFilterScreen({})
             }
         }
     }

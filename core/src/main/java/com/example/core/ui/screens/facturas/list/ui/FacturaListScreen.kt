@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -32,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.core.ui.screens.facturas.list.usecase.FacturaListState
 import com.example.core.ui.screens.facturas.list.usecase.FacturaListViewModel
+import com.example.core.R
 import com.example.domain.factura.Factura
 
 @Composable
@@ -52,14 +56,24 @@ fun FacturaListScreen(facturas: List<Factura>) {
                 title = {
                     Text(
                         "Consumo",
-                        color = Color(158, 201, 88)
+                        color = colorResource(R.color.light_orange)
                     )
+                },
+                navigationIcon = {
+                    IconButton(
+                        onClick = {}
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                            tint = colorResource(R.color.light_orange),
+                            contentDescription = null)
+                    }
                 },
                 actions = {
                     IconButton(
                         onClick = {}
                     ) {
-                        Icon(painter = painterResource(com.example.core.R.drawable.baseline_filter_alt_24),contentDescription = null)
+                        Icon(painter = painterResource(R.drawable.baseline_filter_alt_24),contentDescription = null)
                     }
                 }
             )
@@ -114,7 +128,7 @@ fun FacturaItem(factura: Factura) {
             )
             Text(
                 text = factura.descEstado,
-                color = Color(247, 130, 130, 255)
+                color = colorResource(R.color.dark_orange)
             )
         }
 
@@ -124,7 +138,7 @@ fun FacturaItem(factura: Factura) {
             Text(
                 "${factura.importeOrdenacion} €",
                 modifier = Modifier.padding(end = 16.dp)
-            ) // Elemento C
+            )
         }
     }
     HorizontalDivider(thickness = 1.dp)
