@@ -3,5 +3,6 @@
     <color name="light_orange">#9EC958</color>
     <color name="dark_orange">#f89393</color>
     <color name="light_gray">#e8e8e8</color>
+    <color name="gray_text">#d8dddf</color>
     <color name="green_button">#95bb4e</color>
 </resources>

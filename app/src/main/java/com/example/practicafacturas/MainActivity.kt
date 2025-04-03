@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+//import com.example.core.ui.screens.smartSolar.SmartSolarScreen
 import com.example.practicafacturas.navigation.FacturaNavGraph
 import com.example.practicafacturas.navigation.facturaGraph
 import com.example.practicafacturas.theme.PracticaFacturasTheme
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
                 ){
                     facturaGraph(navController)
                 }
+                //SmartSolarScreen()
             }
         }
     }

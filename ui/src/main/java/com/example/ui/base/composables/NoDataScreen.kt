@@ -1,4 +1,4 @@
-package com.example.practicafacturas.base.composables
+package com.example.ui.base.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

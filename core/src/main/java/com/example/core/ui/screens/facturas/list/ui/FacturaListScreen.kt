@@ -26,24 +26,25 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
+import com.example.core.R
 import com.example.core.ui.screens.facturas.list.usecase.FacturaListState
 import com.example.core.ui.screens.facturas.list.usecase.FacturaListViewModel
-import com.example.core.R
 import com.example.domain.factura.Factura
+import com.example.ui.base.composables.LoadingScreen
+import com.example.ui.base.composables.NoDataScreen
 
 @Composable
 fun FacturaListScreenHost(viewModel: FacturaListViewModel,goToFilter : () -> Unit) {
     when (viewModel.state) {
-        is FacturaListState.Loading -> {}
+        is FacturaListState.Loading -> LoadingScreen("Cargando facturas...")
         is FacturaListState.Success -> FacturaListScreen((viewModel.state as FacturaListState.Success).facturas,goToFilter)
-        is FacturaListState.NoData -> {}
+        is FacturaListState.NoData -> NoDataScreen()
     }
 }
 
@@ -73,7 +74,7 @@ fun FacturaListScreen(facturas: List<Factura>,goToFilter: () -> Unit) {
                     IconButton(
                         onClick = goToFilter
                     ) {
-                        Icon(painter = painterResource(R.drawable.baseline_filter_alt_24),contentDescription = null)
+                        Icon(painter = painterResource(R.drawable.filtericon),contentDescription = null)
                     }
                 }
             )
