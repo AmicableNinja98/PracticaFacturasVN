@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -22,6 +23,7 @@ import androidx.compose.material3.SliderColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,15 +37,35 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.R
+import com.example.core.ui.screens.facturas.list.usecase.FacturaListFilterViewModel
 
 @Composable
-fun FacturaListFilterHost(){
+fun FacturaListFilterHost(
+    facturaListFilterViewModel: FacturaListFilterViewModel,
+    goBack: () -> Unit
+) {
+    LaunchedEffect(Unit) {
+        facturaListFilterViewModel.getFacturasFromRepo()
+    }
 
+    if (facturaListFilterViewModel.state.sinDatos) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("No hay facturas para filtrar")
+        }
+    } else {
+        FacturaListFilterScreen(facturaListFilterViewModel, goBack)
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacturaListFilterScreen(goBack : () -> Unit){
+fun FacturaListFilterScreen(
+    facturaListFilterViewModel: FacturaListFilterViewModel,
+    goBack: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -52,29 +74,30 @@ fun FacturaListFilterScreen(goBack : () -> Unit){
                     IconButton(
                         onClick = goBack
                     ) {
-                        Icon(painter = painterResource(R.drawable.close_icon),contentDescription = null)
+                        Icon(
+                            painter = painterResource(R.drawable.close_icon),
+                            contentDescription = null
+                        )
                     }
                 }
             )
         }
-    ) {
-        innerPadding ->
-        FacturaListFilter(Modifier.padding(innerPadding))
+    ) { innerPadding ->
+        FacturaListFilter(facturaListFilterViewModel,goBack ,Modifier.padding(innerPadding))
     }
 }
 
 @Composable
-fun FacturaListFilter(modifier: Modifier){
-    var sliderValue by remember{ mutableStateOf(0f..100f) }
-    val states = listOf(
-        "Pagadas",
-        "Anuladas",
-        "Cuota fija",
-        "Pendientes de pago",
-        "Plan de pago"
-    )
+fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goBack: () -> Unit ,modifier: Modifier) {
+    var sliderValue by remember {
+        mutableStateOf(
+            0f..facturaListFilterViewModel.state.importeMax.toFloat()
+        )
+    }
     Column(
-        modifier = modifier.padding(20.dp).verticalScroll(rememberScrollState())
+        modifier = modifier
+            .padding(20.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         Text(
             text = "Filtrar Facturas",
@@ -137,15 +160,18 @@ fun FacturaListFilter(modifier: Modifier){
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "5€  -  250€",
+                text = "${facturaListFilterViewModel.state.importeMin} € - ${facturaListFilterViewModel.state.importeMax} €",
                 color = colorResource(R.color.light_orange)
             )
         }
         RangeSlider(
             value = sliderValue,
             modifier = Modifier.padding(10.dp),
-            onValueChange = {sliderValue = it},
-            valueRange = 5f..250f,
+            onValueChange = {
+                sliderValue = it
+                facturaListFilterViewModel.onSliderValueChange(sliderValue)
+            },
+            valueRange = 0f..sliderValue.endInclusive,
             colors = SliderColors(
                 thumbColor = colorResource(R.color.dark_orange),
                 activeTrackColor = colorResource(R.color.dark_orange),
@@ -165,14 +191,16 @@ fun FacturaListFilter(modifier: Modifier){
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
         )
-        states.forEach {
+        facturaListFilterViewModel.state.estados.keys.forEach {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Checkbox(
-                    checked = false,
-                    onCheckedChange = {}
+                    checked = facturaListFilterViewModel.state.estados.getValue(it),
+                    onCheckedChange = { value ->
+                        facturaListFilterViewModel.onCheckedChange(it)
+                    }
                 )
                 Text(it)
             }
@@ -187,7 +215,10 @@ fun FacturaListFilter(modifier: Modifier){
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Button(
-                    onClick = {},
+                    onClick = {
+                        facturaListFilterViewModel.onFiltersApply()
+                        goBack()
+                    },
                     colors = ButtonColors(
                         containerColor = colorResource(R.color.green_button),
                         contentColor = Color.White,
@@ -199,7 +230,9 @@ fun FacturaListFilter(modifier: Modifier){
                     Text("Aplicar")
                 }
                 Button(
-                    onClick = {},
+                    onClick = {
+                        facturaListFilterViewModel.onFiltersReset()
+                    },
                     colors = ButtonColors(
                         containerColor = Color.Gray,
                         contentColor = Color.White,

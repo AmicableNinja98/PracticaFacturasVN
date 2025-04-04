@@ -1,6 +1,8 @@
 package com.example.core.ui.screens.facturas.list.usecase
 
+import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -12,15 +14,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FacturaListViewModel @Inject constructor(private val facturaRepository: FacturaRepository) : ViewModel() {
+class FacturaListViewModel @Inject constructor(private val facturaRepository: FacturaRepository) :
+    ViewModel() {
     var state by mutableStateOf<FacturaListState>(FacturaListState.Loading)
         private set
 
-    init {
-        getFacturas()
-    }
-
-    private fun getFacturas(){
+    fun getFacturas() {
         /*viewModelScope.launch {
             state = FacturaListState.Loading
             facturaRepository.getFacturasFromDatabase().collect {
@@ -31,15 +30,31 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
                     FacturaListState.Success(facturas)
             }
         }*/
-        state = FacturaListState.Success(
-            listOf(
-                Factura(
-                    1,"Pendiente de pago",1.56,"07/02/2019"
-                ),
-                Factura(
-                    2,"Pagada",25.14,"05/02/2019"
-                )
+        if (FacturaRepository.getFiltersApplied()) {
+            val facturas = mutableStateListOf<Factura>()
+            FacturaRepository.getIds().forEach {
+                facturas.add(FacturaRepository.getFacturaById(it)!!)
+            }
+            Log.i("INFO FACTURAS FILTRO", facturas.joinToString(","))
+            state = if (facturas.isNotEmpty())
+                FacturaListState.Success(facturas)
+            else
+                FacturaListState.NoData
+        } else {
+            val facturas = FacturaRepository.getFacturas()
+            Log.i("INFO NO FILTRO", facturas.joinToString(","))
+            state = FacturaListState.Success(
+                facturas.toMutableList()
             )
-        )
+        }
+    }
+
+    fun sendIds() {
+        if (state is FacturaListState.Success) {
+            val ids = (state as FacturaListState.Success).facturas.map {
+                it.id
+            }.toMutableList()
+            FacturaRepository.setIds(ids)
+        }
     }
 }

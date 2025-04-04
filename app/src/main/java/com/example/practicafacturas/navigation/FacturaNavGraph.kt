@@ -5,8 +5,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.core.ui.screens.facturas.list.ui.FacturaListFilterScreen
+import com.example.core.ui.screens.facturas.list.ui.FacturaListFilterHost
 import com.example.core.ui.screens.facturas.list.ui.FacturaListScreenHost
+import com.example.core.ui.screens.facturas.list.usecase.FacturaListFilterViewModel
 import com.example.core.ui.screens.facturas.list.usecase.FacturaListViewModel
 
 object FacturaNavGraph {
@@ -32,7 +33,8 @@ private fun NavGraphBuilder.list(navController: NavController){
 
 private fun NavGraphBuilder.filter(navController: NavController){
     composable(route = FacturaNavGraph.filter()) {
-        FacturaListFilterScreen(
+        FacturaListFilterHost(
+            hiltViewModel<FacturaListFilterViewModel>(),
             goBack = {
                 navController.popBackStack()
             }

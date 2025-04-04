@@ -22,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -39,18 +40,9 @@ import com.example.domain.factura.Factura
 import com.example.ui.base.composables.LoadingScreen
 import com.example.ui.base.composables.NoDataScreen
 
-@Composable
-fun FacturaListScreenHost(viewModel: FacturaListViewModel,goToFilter : () -> Unit) {
-    when (viewModel.state) {
-        is FacturaListState.Loading -> LoadingScreen("Cargando facturas...")
-        is FacturaListState.Success -> FacturaListScreen((viewModel.state as FacturaListState.Success).facturas,goToFilter)
-        is FacturaListState.NoData -> NoDataScreen()
-    }
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacturaListScreen(facturas: List<Factura>,goToFilter: () -> Unit) {
+fun FacturaListScreenHost(facturaListViewModel: FacturaListViewModel, goToFilter: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -67,12 +59,16 @@ fun FacturaListScreen(facturas: List<Factura>,goToFilter: () -> Unit) {
                         Icon(
                             Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                             tint = colorResource(R.color.light_orange),
-                            contentDescription = null)
+                            contentDescription = null
+                        )
                     }
                 },
                 actions = {
                     IconButton(
-                        onClick = goToFilter
+                        onClick = {
+                            facturaListViewModel.sendIds()
+                            goToFilter()
+                        }
                     ) {
                         Icon(painter = painterResource(R.drawable.filtericon),contentDescription = null)
                     }
@@ -80,12 +76,19 @@ fun FacturaListScreen(facturas: List<Factura>,goToFilter: () -> Unit) {
             )
         }
     ) { innerPadding ->
-        FacturaList(facturas, modifier = Modifier.padding(innerPadding))
+        LaunchedEffect(Unit) {
+            facturaListViewModel.getFacturas()
+        }
+        when (facturaListViewModel.state) {
+            is FacturaListState.Loading -> LoadingScreen("Cargando facturas...", modifier = Modifier.padding(innerPadding))
+            is FacturaListState.Success -> FacturaListScreen((facturaListViewModel.state as FacturaListState.Success).facturas, modifier = Modifier.padding(innerPadding))
+            is FacturaListState.NoData -> NoDataScreen(Modifier.padding(innerPadding))
+        }
     }
 }
 
 @Composable
-fun FacturaList(facturas: List<Factura>, modifier: Modifier) {
+fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
     LazyColumn(
         modifier = modifier,
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
