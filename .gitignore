@@ -14,6 +14,7 @@
 .cxx
 .idea
 build
+.kotlin
 
 gradle.properties
 local.properties
