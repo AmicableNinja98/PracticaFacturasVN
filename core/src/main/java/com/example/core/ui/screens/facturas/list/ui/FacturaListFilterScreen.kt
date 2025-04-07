@@ -13,6 +13,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -22,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SliderColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -87,6 +91,7 @@ fun FacturaListFilterScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goBack: () -> Unit ,modifier: Modifier) {
     var sliderValue by remember {
@@ -94,6 +99,11 @@ fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goB
             0f..facturaListFilterViewModel.state.importeMax.toFloat()
         )
     }
+    val openDialogFirstDate = remember { mutableStateOf(false) }
+    val openDialogSecondDate = remember { mutableStateOf(false) }
+    val datePickerFirstDateState = rememberDatePickerState()
+    val datePickerSecondDateState = rememberDatePickerState()
+
     Column(
         modifier = modifier
             .padding(20.dp)
@@ -119,7 +129,9 @@ fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goB
             ) {
                 Text(text = "Desde:")
                 Button(
-                    onClick = {},
+                    onClick = {
+                        openDialogFirstDate.value = true
+                    },
                     colors = ButtonColors(
                         containerColor = colorResource(R.color.light_gray),
                         contentColor = Color.Black,
@@ -127,7 +139,7 @@ fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goB
                         disabledContentColor = Color.LightGray
                     )
                 ) {
-                    Text("día/mes/año")
+                    Text(facturaListFilterViewModel.state.fechaInicio ?: "día/mes/año")
                 }
             }
             Column(
@@ -135,7 +147,9 @@ fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goB
             ) {
                 Text(text = "Hasta:")
                 Button(
-                    onClick = {},
+                    onClick = {
+                        openDialogSecondDate.value = true
+                    },
                     colors = ButtonColors(
                         containerColor = colorResource(R.color.light_gray),
                         contentColor = Color.Black,
@@ -143,9 +157,33 @@ fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goB
                         disabledContentColor = Color.LightGray
                     )
                 ) {
-                    Text("día/mes/año")
+                    Text(facturaListFilterViewModel.state.fechaFin ?: "día/mes/año")
                 }
             }
+        }
+        if(openDialogFirstDate.value){
+            FacturaDatePicker(
+                onDismissRequest = {
+                    openDialogFirstDate.value = false
+                },
+                onClick = {
+                    facturaListFilterViewModel.onStartDateChanged(datePickerFirstDateState.selectedDateMillis)
+                    openDialogFirstDate.value = false
+                },
+                datePickerState = datePickerFirstDateState
+            )
+        }
+        if(openDialogSecondDate.value){
+            FacturaDatePicker(
+                onDismissRequest = {
+                    openDialogSecondDate.value = false
+                },
+                onClick = {
+                    facturaListFilterViewModel.onEndDateChanged(datePickerSecondDateState.selectedDateMillis)
+                    openDialogSecondDate.value = false
+                },
+                datePickerState = datePickerSecondDateState
+            )
         }
         HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(vertical = 15.dp))
         Text(
@@ -216,7 +254,7 @@ fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goB
             ) {
                 Button(
                     onClick = {
-                        facturaListFilterViewModel.onFiltersApply()
+                        facturaListFilterViewModel.onApplyFiltersClick()
                         goBack()
                     },
                     colors = ButtonColors(
@@ -245,5 +283,24 @@ fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goB
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FacturaDatePicker(onDismissRequest: () -> Unit,onClick : () -> Unit,datePickerState: DatePickerState){
+    DatePickerDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            Button(
+                onClick = onClick
+            ) {
+                Text("Confirmar")
+            }
+        }
+    ){
+        DatePicker(
+            state = datePickerState
+        )
     }
 }

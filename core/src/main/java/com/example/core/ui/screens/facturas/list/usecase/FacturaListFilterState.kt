@@ -19,9 +19,27 @@ data class FacturaListFilterState(
         "Plan de pago" to false
     ),
 
+    //var filters : List<FiltersToApply> = FiltersToApply.getValues(),
+
     var filtroFechaAplicado : Boolean = false,
     var filtroImporteAplicado : Boolean = false,
     var filtroEstadoAplicado : Boolean = false,
 
     var sinDatos : Boolean = true
 )
+
+enum class FiltersToApply(
+    var value : Boolean = false
+){
+    FECHA,
+    IMPORTE,
+    ESTADO;
+
+    companion object{
+        fun getValues() = listOf(
+            FECHA,
+            IMPORTE,
+            ESTADO
+        )
+    }
+}
