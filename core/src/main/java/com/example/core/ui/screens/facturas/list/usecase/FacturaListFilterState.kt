@@ -9,7 +9,6 @@ data class FacturaListFilterState(
     var fechaFin : String? = null,
     var importeMin : Double = 0.0,
     var importeMax : Double = 0.0,
-    var sliderValue : ClosedFloatingPointRange<Float>? = null,
     var facturas : MutableList<Factura> = mutableStateListOf(),
     var estados : MutableMap<String, Boolean> = mutableStateMapOf<String, Boolean>(
         "Pagada" to false,
@@ -19,27 +18,9 @@ data class FacturaListFilterState(
         "Plan de pago" to false
     ),
 
-    //var filters : List<FiltersToApply> = FiltersToApply.getValues(),
-
     var filtroFechaAplicado : Boolean = false,
     var filtroImporteAplicado : Boolean = false,
     var filtroEstadoAplicado : Boolean = false,
 
     var sinDatos : Boolean = true
 )
-
-enum class FiltersToApply(
-    var value : Boolean = false
-){
-    FECHA,
-    IMPORTE,
-    ESTADO;
-
-    companion object{
-        fun getValues() = listOf(
-            FECHA,
-            IMPORTE,
-            ESTADO
-        )
-    }
-}

@@ -28,18 +28,23 @@ class FacturaListFilterViewModel @Inject constructor() : ViewModel() {
     }
 
     fun getFacturasFromRepo() {
-        val facturas = mutableStateListOf<Factura>()
+        val facturasRepo = mutableStateListOf<Factura>()
         FacturaRepository.getIds().forEach {
-            facturas.add(FacturaRepository.getFacturaById(it)!!)
+            facturasRepo.add(FacturaRepository.getFacturaById(it)!!)
         }
-        if (facturas.isNotEmpty())
-            state = state.copy(
-                facturas = facturas,
-                sinDatos = false,
-                importeMin = facturas.minOf { it.importeOrdenacion },
-                importeMax = facturas.maxOf { it.importeOrdenacion })
+        if (facturasRepo.isNotEmpty())
+            updateStateAfterInit(facturasRepo)
         else if (FacturaRepository.getFiltersApplied())
-            state = state.copy(facturas = facturasOriginal, sinDatos = false)
+            updateStateAfterInit(facturasOriginal)
+    }
+
+    private fun updateStateAfterInit(facturas : MutableList<Factura>){
+        state = state.copy(
+            facturas = facturas,
+            importeMin = facturas.minOf { it.importeOrdenacion },
+            importeMax = facturas.maxOf { it.importeOrdenacion },
+            sinDatos = false
+        )
     }
 
     fun onCheckedChange(key: String) {
@@ -69,8 +74,12 @@ class FacturaListFilterViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun onSliderValueChange(newValue: ClosedFloatingPointRange<Float>) {
-        state = state.copy(sliderValue = newValue, filtroImporteAplicado = true)
+    fun onSliderValueChange(values: ClosedFloatingPointRange<Float>) {
+        state = state.copy(
+            importeMin = values.start.toDouble(),
+            importeMax = values.endInclusive.toDouble(),
+            filtroImporteAplicado = true
+        )
     }
 
     fun onFiltersReset() {
@@ -79,7 +88,12 @@ class FacturaListFilterViewModel @Inject constructor() : ViewModel() {
             state.estados.put(it, false)
         }
         state = state.copy(
-            estados = estados, filtroImporteAplicado = false,
+            estados = estados,
+            fechaInicio = null,
+            fechaFin = null,
+            importeMin = facturasOriginal.minOf { it.importeOrdenacion },
+            importeMax = facturasOriginal.maxOf { it.importeOrdenacion },
+            filtroImporteAplicado = false,
             filtroFechaAplicado = false,
             filtroEstadoAplicado = false
         )
@@ -92,8 +106,8 @@ class FacturaListFilterViewModel @Inject constructor() : ViewModel() {
             state = state.copy(facturas = applyFilters())
 
             Log.i(
-                "INFO ESTADOS SELECCIONADOS",
-                state.estados.filter { it.value == true }.toList().joinToString(",")
+                "INFO PRECIOS SELECCIONADOS",
+                "Minimo: ${state.importeMin} Máximo: ${state.importeMax}"
             )
             Log.i("INFO FILTRO", state.facturas.joinToString(","))
 
@@ -113,7 +127,7 @@ class FacturaListFilterViewModel @Inject constructor() : ViewModel() {
 
     private fun applyFilters(): MutableList<Factura> {
         return facturasOriginal.filter { factura ->
-            val facturaDate = parseStringToDate(factura.fecha.replace("/","-"))
+            val facturaDate = parseStringToDate(factura.fecha.replace("/", "-"))
             val startDate = if (state.fechaInicio != null) parseStringToDate(
                 state.fechaInicio!!.replace(
                     "/",

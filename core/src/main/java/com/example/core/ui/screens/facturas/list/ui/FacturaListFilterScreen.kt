@@ -94,11 +94,12 @@ fun FacturaListFilterScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goBack: () -> Unit ,modifier: Modifier) {
-    var sliderValue by remember {
+    var selectedSliderValue = remember {
         mutableStateOf(
             0f..facturaListFilterViewModel.state.importeMax.toFloat()
         )
     }
+    var sliderRange = 0f..facturaListFilterViewModel.state.importeMax.toFloat()
     val openDialogFirstDate = remember { mutableStateOf(false) }
     val openDialogSecondDate = remember { mutableStateOf(false) }
     val datePickerFirstDateState = rememberDatePickerState()
@@ -198,18 +199,19 @@ fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goB
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "${facturaListFilterViewModel.state.importeMin} € - ${facturaListFilterViewModel.state.importeMax} €",
+                text = "${"%.2f".format(facturaListFilterViewModel.state.importeMin)} € - ${"%.2f".format(facturaListFilterViewModel.state.importeMax)} €",
                 color = colorResource(R.color.light_orange)
             )
         }
         RangeSlider(
-            value = sliderValue,
-            modifier = Modifier.padding(10.dp),
-            onValueChange = {
-                sliderValue = it
-                facturaListFilterViewModel.onSliderValueChange(sliderValue)
+            value = selectedSliderValue.value,
+            modifier = Modifier.padding(16.dp),
+            onValueChange = { values ->
+                selectedSliderValue.value = values
+                facturaListFilterViewModel.onSliderValueChange(values)
             },
-            valueRange = 0f..sliderValue.endInclusive,
+            valueRange = sliderRange,
+            steps = 5,
             colors = SliderColors(
                 thumbColor = colorResource(R.color.dark_orange),
                 activeTrackColor = colorResource(R.color.dark_orange),
