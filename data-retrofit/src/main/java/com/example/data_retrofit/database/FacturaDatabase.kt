@@ -28,21 +28,5 @@ abstract class FacturaDatabase : RoomDatabase(){
                 instance
             }
         }
-
-        /*private fun prepoulateDatabase(facturaDatabase: FacturaDatabase){
-            val facturaDao = facturaDatabase.getFacturaDao()
-            runBlocking {
-                val response = facturaDatabase.getApiService().getFacturas()
-                var id = 0
-                if(response.isSuccessful){
-                    val body = response.body()
-                    if(body != null && body.numFacturas > 0 && body.facturas.isNotEmpty())
-                        body.facturas.forEach { factura ->
-                            factura.id = id++
-                            facturaDao.insertFactura(factura)
-                        }
-                }
-            }
-        }*/
     }
 }

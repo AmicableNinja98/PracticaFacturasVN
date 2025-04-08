@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.core.R
+import com.example.core.extensions.toFormattedDisplayDateOrNull
 import com.example.core.ui.screens.facturas.list.usecase.FacturaListState
 import com.example.core.ui.screens.facturas.list.usecase.FacturaListViewModel
 import com.example.domain.factura.Factura
@@ -115,6 +116,7 @@ fun FacturaItem(factura: Factura) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(bottom = 10.dp)
             .clickable(
                 onClick = {
                     openDialog.value = true
@@ -128,10 +130,12 @@ fun FacturaItem(factura: Factura) {
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = factura.fecha
+                text = factura.fecha.toFormattedDisplayDateOrNull() ?: "",
+                fontSize = 20.sp
             )
             Text(
                 text = factura.descEstado,
+                fontSize = 17.sp,
                 color = colorResource(R.color.dark_orange)
             )
         }
@@ -141,6 +145,7 @@ fun FacturaItem(factura: Factura) {
         ) {
             Text(
                 "${factura.importeOrdenacion} €",
+                fontSize = 20.sp,
                 modifier = Modifier.padding(end = 16.dp)
             )
         }

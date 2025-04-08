@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.core.R
 import com.example.core.ui.screens.facturas.list.usecase.FacturaListFilterViewModel
+import com.example.ui.base.composables.BaseButton
 
 @Composable
 fun FacturaListFilterHost(
@@ -56,7 +57,7 @@ fun FacturaListFilterHost(
 
     if (facturaListFilterViewModel.state.sinDatos) {
         openDialog.value = true
-        if(openDialog.value){
+        if (openDialog.value) {
             NoDataFilterPopUp(
                 title = "Sin facturas",
                 message = "No se han encontrado facturas que se correspondan a esos filtros",
@@ -94,13 +95,17 @@ fun FacturaListFilterScreen(
             )
         }
     ) { innerPadding ->
-        FacturaListFilter(facturaListFilterViewModel,goBack ,Modifier.padding(innerPadding))
+        FacturaListFilter(facturaListFilterViewModel, goBack, Modifier.padding(innerPadding))
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goBack: () -> Unit ,modifier: Modifier) {
+fun FacturaListFilter(
+    facturaListFilterViewModel: FacturaListFilterViewModel,
+    goBack: () -> Unit,
+    modifier: Modifier
+) {
     Column(
         modifier = modifier
             .padding(20.dp)
@@ -122,20 +127,20 @@ fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goB
         SeccionSlider(facturaListFilterViewModel)
         HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(vertical = 15.dp))
         SeccionCheckBox(facturaListFilterViewModel)
-        SeccionBotones(facturaListFilterViewModel,goBack)
+        SeccionBotones(facturaListFilterViewModel, goBack)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel){
+fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
     val openDialogFirstDate = remember { mutableStateOf(false) }
     val openDialogSecondDate = remember { mutableStateOf(false) }
     val datePickerFirstDateState = rememberDatePickerState()
     val datePickerSecondDateState = rememberDatePickerState()
 
     Row(
-        modifier = Modifier.padding(vertical = 20.dp),
+        modifier = Modifier.padding(top = 15.dp, bottom = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Column(
@@ -175,7 +180,7 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel){
             }
         }
     }
-    if(openDialogFirstDate.value){
+    if (openDialogFirstDate.value) {
         FacturaDatePicker(
             onDismissRequest = {
                 openDialogFirstDate.value = false
@@ -187,7 +192,7 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel){
             datePickerState = datePickerFirstDateState
         )
     }
-    if(openDialogSecondDate.value){
+    if (openDialogSecondDate.value) {
         FacturaDatePicker(
             onDismissRequest = {
                 openDialogSecondDate.value = false
@@ -202,7 +207,7 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel){
 }
 
 @Composable
-fun SeccionCheckBox(facturaListFilterViewModel: FacturaListFilterViewModel){
+fun SeccionCheckBox(facturaListFilterViewModel: FacturaListFilterViewModel) {
     Text(
         text = "Por estado",
         fontWeight = FontWeight.Bold,
@@ -225,7 +230,7 @@ fun SeccionCheckBox(facturaListFilterViewModel: FacturaListFilterViewModel){
 }
 
 @Composable
-fun SeccionSlider(facturaListFilterViewModel : FacturaListFilterViewModel){
+fun SeccionSlider(facturaListFilterViewModel: FacturaListFilterViewModel) {
     Text(
         text = "Por un importe",
         fontWeight = FontWeight.Bold,
@@ -238,14 +243,20 @@ fun SeccionSlider(facturaListFilterViewModel : FacturaListFilterViewModel){
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "${"%.2f".format(facturaListFilterViewModel.state.importeMin)} € - ${"%.2f".format(facturaListFilterViewModel.state.importeMax)} €",
+            text = "${"%.2f".format(facturaListFilterViewModel.state.importeMin)} € - ${
+                "%.2f".format(
+                    facturaListFilterViewModel.state.importeMax
+                )
+            } €",
             color = colorResource(R.color.light_orange)
         )
     }
     ImporteSlider(
         sliderValues = facturaListFilterViewModel.state.importeMin.toFloat()..facturaListFilterViewModel.state.importeMax.toFloat(),
-        importeMinAbsoluto = facturaListFilterViewModel.state.facturas.minOfOrNull { it.importeOrdenacion }?.toFloat() ?: 0f,
-        importeMaxAbsoluto = facturaListFilterViewModel.state.facturas.maxOfOrNull { it.importeOrdenacion }?.toFloat() ?: 0f,
+        importeMinAbsoluto = facturaListFilterViewModel.state.facturas.minOfOrNull { it.importeOrdenacion }
+            ?.toFloat() ?: 0f,
+        importeMaxAbsoluto = facturaListFilterViewModel.state.facturas.maxOfOrNull { it.importeOrdenacion }
+            ?.toFloat() ?: 0f,
         onValueChange = { range ->
             facturaListFilterViewModel.onSliderValueChange(range)
         }
@@ -253,7 +264,7 @@ fun SeccionSlider(facturaListFilterViewModel : FacturaListFilterViewModel){
 }
 
 @Composable
-fun SeccionBotones(facturaListFilterViewModel: FacturaListFilterViewModel,goBack: () -> Unit){
+fun SeccionBotones(facturaListFilterViewModel: FacturaListFilterViewModel, goBack: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -263,24 +274,24 @@ fun SeccionBotones(facturaListFilterViewModel: FacturaListFilterViewModel,goBack
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Button(
-                onClick = {
-                    facturaListFilterViewModel.onApplyFiltersClick()
-                    if(!facturaListFilterViewModel.state.sinDatos){
-                        goBack()
-                    }
-                },
+            BaseButton(
+                text = "Aplicar",
                 colors = ButtonColors(
                     containerColor = colorResource(R.color.green_button),
                     contentColor = Color.White,
                     disabledContainerColor = Color.LightGray,
                     disabledContentColor = Color.LightGray
                 ),
+                onClick = {
+                    facturaListFilterViewModel.onApplyFiltersClick()
+                    if (!facturaListFilterViewModel.state.sinDatos) {
+                        goBack()
+                    }
+                },
                 modifier = Modifier.width(200.dp)
-            ) {
-                Text("Aplicar")
-            }
-            Button(
+            )
+            BaseButton(
+                text = "Eliminar filtros",
                 onClick = {
                     facturaListFilterViewModel.onFiltersReset()
                 },
@@ -291,16 +302,18 @@ fun SeccionBotones(facturaListFilterViewModel: FacturaListFilterViewModel,goBack
                     disabledContentColor = Color.LightGray
                 ),
                 modifier = Modifier.width(200.dp)
-            ) {
-                Text("Eliminar filtros")
-            }
+            )
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacturaDatePicker(onDismissRequest: () -> Unit,onClick : () -> Unit,datePickerState: DatePickerState){
+fun FacturaDatePicker(
+    onDismissRequest: () -> Unit,
+    onClick: () -> Unit,
+    datePickerState: DatePickerState
+) {
     DatePickerDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
@@ -310,7 +323,7 @@ fun FacturaDatePicker(onDismissRequest: () -> Unit,onClick : () -> Unit,datePick
                 Text("Confirmar")
             }
         }
-    ){
+    ) {
         DatePicker(
             state = datePickerState
         )
@@ -343,7 +356,7 @@ fun ImporteSlider(
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(5.dp))
 
         RangeSlider(
             value = sliderValues,

@@ -5,13 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.extensions.toLocalDateOrNull
 import com.example.data_retrofit.repository.FacturaRepository
 import com.example.domain.factura.Factura
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -58,14 +58,14 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
 
     fun onStartDateChanged(date: Long?) {
         if (date != null) {
-            val dateFormat = SimpleDateFormat(format)
+            val dateFormat = SimpleDateFormat(format, Locale.getDefault())
             state = state.copy(fechaInicio = dateFormat.format(date), filtroFechaAplicado = true)
         }
     }
 
     fun onEndDateChanged(date: Long?) {
         if (date != null) {
-            val dateFormat = SimpleDateFormat(format)
+            val dateFormat = SimpleDateFormat(format,Locale.getDefault())
             state = state.copy(fechaFin = dateFormat.format(date), filtroFechaAplicado = true)
         }
     }
@@ -122,22 +122,18 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
 
     private fun applyFilters(): MutableList<Factura> {
         return facturasOriginal.filter { factura ->
-            val facturaDate = parseStringToDate(factura.fecha.replace("/", "-"))
-            val startDate = if (state.fechaInicio != null) parseStringToDate(
-                state.fechaInicio!!.replace(
-                    "/",
-                    "-"
-                )
-            ) else parseStringToDate("01-01-2000")
-            val endDate = if (state.fechaFin != null) parseStringToDate(
-                state.fechaFin!!.replace(
-                    "/",
-                    "-"
-                )
-            ) else /*LocalDate.parse(LocalDate.now().toString(), DateTimeFormatter.ofPattern(format))*/
-                parseStringToDate("31-12-2025")
+            val facturaDate = factura.fecha.replace("/", "-").toLocalDateOrNull()
+            val startDate = if (state.fechaInicio != null) state.fechaInicio!!.replace(
+                "/",
+                "-"
+            ).toLocalDateOrNull() else "01-01-2000".toLocalDateOrNull()
+            val endDate = if (state.fechaFin != null) state.fechaFin!!.replace(
+                "/",
+                "-"
+            ).toLocalDateOrNull() else /*LocalDate.parse(LocalDate.now().toString(), DateTimeFormatter.ofPattern(format))*/
+                "31-12-2025".toLocalDateOrNull()
 
-            (if (state.filtroFechaAplicado) facturaDate >= startDate && facturaDate <= endDate
+            (if (state.filtroFechaAplicado) facturaDate!! >= startDate && facturaDate <= endDate
             else true) &&
                     (if (state.filtroImporteAplicado) factura.importeOrdenacion >= state.importeMin && factura.importeOrdenacion <= state.importeMax else true) &&
                     (if (state.filtroEstadoAplicado) factura.descEstado == state.estados.keys.firstOrNull { key ->
@@ -150,9 +146,5 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         FacturaRepository.setIds(facturasOriginal.map {
             it.id
         }.toMutableList())
-    }
-
-    private fun parseStringToDate(date: String): LocalDate {
-        return LocalDate.parse(date, DateTimeFormatter.ofPattern("dd-MM-yyyy"))
     }
 }

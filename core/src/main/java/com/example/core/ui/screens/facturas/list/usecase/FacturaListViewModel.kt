@@ -35,7 +35,7 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
                 facturaRepository.getFacturasFromDatabase().collect {
                         facturas ->
                     if(facturas.isEmpty()){
-                        facturaRepository.getData()
+                        facturaRepository.getDataFromApiAndInsertToDatabase()
                         facturaRepository.getFacturasFromDatabase().collect{
                                 facturas ->
                             state = if(facturas.isEmpty())
