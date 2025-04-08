@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,8 +60,8 @@ fun FacturaListFilterHost(
         openDialog.value = true
         if (openDialog.value) {
             NoDataFilterPopUp(
-                title = "Sin facturas",
-                message = "No se han encontrado facturas que se correspondan a esos filtros",
+                title = stringResource(R.string.filter_popUp_title),
+                message = stringResource(R.string.filter_popUp_message),
                 onDismiss = {
                     openDialog.value = false
                     facturaListFilterViewModel.onFiltersReset()
@@ -112,13 +113,13 @@ fun FacturaListFilter(
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            text = "Filtrar Facturas",
+            text = stringResource(R.string.filter_screen_title),
             fontWeight = FontWeight.Bold,
             fontSize = 40.sp,
             modifier = Modifier.padding(bottom = 12.dp)
         )
         Text(
-            text = "Con fecha de emisión",
+            text = stringResource(R.string.filter_date_title),
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
         )
@@ -146,8 +147,9 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
         Column(
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Text(text = "Desde:")
-            Button(
+            Text(text = stringResource(R.string.filter_startDate_title))
+            BaseButton(
+                text = facturaListFilterViewModel.state.fechaInicio ?: stringResource(R.string.filter_date_button_text),
                 onClick = {
                     openDialogFirstDate.value = true
                 },
@@ -157,15 +159,14 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
                     disabledContainerColor = Color.LightGray,
                     disabledContentColor = Color.LightGray
                 )
-            ) {
-                Text(facturaListFilterViewModel.state.fechaInicio ?: "día/mes/año")
-            }
+            )
         }
         Column(
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Text(text = "Hasta:")
-            Button(
+            Text(text = stringResource(R.string.filter_endDate_title))
+            BaseButton(
+                text = facturaListFilterViewModel.state.fechaFin ?: stringResource(R.string.filter_date_button_text),
                 onClick = {
                     openDialogSecondDate.value = true
                 },
@@ -175,9 +176,7 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
                     disabledContainerColor = Color.LightGray,
                     disabledContentColor = Color.LightGray
                 )
-            ) {
-                Text(facturaListFilterViewModel.state.fechaFin ?: "día/mes/año")
-            }
+            )
         }
     }
     if (openDialogFirstDate.value) {
@@ -209,7 +208,7 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
 @Composable
 fun SeccionCheckBox(facturaListFilterViewModel: FacturaListFilterViewModel) {
     Text(
-        text = "Por estado",
+        text = stringResource(R.string.filter_checkBox_title),
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
     )
@@ -232,7 +231,7 @@ fun SeccionCheckBox(facturaListFilterViewModel: FacturaListFilterViewModel) {
 @Composable
 fun SeccionSlider(facturaListFilterViewModel: FacturaListFilterViewModel) {
     Text(
-        text = "Por un importe",
+        text = stringResource(R.string.filter_importe_title),
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
     )
@@ -275,7 +274,7 @@ fun SeccionBotones(facturaListFilterViewModel: FacturaListFilterViewModel, goBac
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             BaseButton(
-                text = "Aplicar",
+                text = stringResource(R.string.filter_applyButton_text),
                 colors = ButtonColors(
                     containerColor = colorResource(R.color.green_button),
                     contentColor = Color.White,
@@ -291,7 +290,7 @@ fun SeccionBotones(facturaListFilterViewModel: FacturaListFilterViewModel, goBac
                 modifier = Modifier.width(200.dp)
             )
             BaseButton(
-                text = "Eliminar filtros",
+                text = stringResource(R.string.filter_resetButton_text),
                 onClick = {
                     facturaListFilterViewModel.onFiltersReset()
                 },
@@ -320,7 +319,7 @@ fun FacturaDatePicker(
             Button(
                 onClick = onClick
             ) {
-                Text("Confirmar")
+                Text(stringResource(R.string.filter_popUp_confirm_text))
             }
         }
     ) {
@@ -399,7 +398,7 @@ fun NoDataFilterPopUp(title: String, message: String, onDismiss: () -> Unit) {
             Button(
                 onClick = onDismiss
             ) {
-                Text("Cerrar")
+                Text(stringResource(R.string.filter_popUp_close_text))
             }
         }
     )

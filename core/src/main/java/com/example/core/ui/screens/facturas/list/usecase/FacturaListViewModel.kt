@@ -1,6 +1,5 @@
 package com.example.core.ui.screens.facturas.list.usecase
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,7 +25,6 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
                 FacturaRepository.getIds().forEach { id ->
                     facturas.add(facturaRepository.getFacturaById(id)!!)
                 }
-                Log.i("INFO FACTURAS FILTRO", facturas.joinToString(","))
                 state = if (facturas.isNotEmpty())
                     FacturaListState.Success(facturas)
                 else

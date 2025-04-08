@@ -29,6 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -81,7 +82,7 @@ fun FacturaListScreenHost(facturaListViewModel: FacturaListViewModel, goToFilter
             facturaListViewModel.getFacturas()
         }
         when (facturaListViewModel.state) {
-            is FacturaListState.Loading -> LoadingScreen("Cargando facturas...", modifier = Modifier.padding(innerPadding))
+            is FacturaListState.Loading -> LoadingScreen(stringResource(R.string.loading_screen_title), modifier = Modifier.padding(innerPadding))
             is FacturaListState.Success -> FacturaListScreen((facturaListViewModel.state as FacturaListState.Success).facturas, modifier = Modifier.padding(innerPadding))
             is FacturaListState.NoData -> NoDataScreen(Modifier.padding(innerPadding))
         }
@@ -97,7 +98,7 @@ fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
     ) {
         item {
             Text(
-                text = "Facturas",
+                text = stringResource(R.string.factura_list_title),
                 fontWeight = FontWeight.Bold,
                 fontSize = 40.sp,
                 modifier = Modifier.padding(bottom = 12.dp)
@@ -153,8 +154,8 @@ fun FacturaItem(factura: Factura) {
     HorizontalDivider(thickness = 1.dp)
     if(openDialog.value){
         FacturaItemPopUp(
-            title = "Información",
-            message = "Esta funcionalidad aún no está disponible",
+            title = stringResource(R.string.popUp_title),
+            message = stringResource(R.string.popUp_message),
             onDismiss = {
                 openDialog.value = false
             }
@@ -181,7 +182,7 @@ fun FacturaItemPopUp(title: String, message: String, onDismiss: () -> Unit) {
             Button(
                 onClick = onDismiss
             ) {
-                Text("Cerrar")
+                Text(stringResource(R.string.close_popUp))
             }
         }
     )

@@ -11,7 +11,7 @@ fun BaseButton(
     text : String,
     colors: ButtonColors,
     onClick : () -> Unit,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ){
     Button(
         onClick = onClick,

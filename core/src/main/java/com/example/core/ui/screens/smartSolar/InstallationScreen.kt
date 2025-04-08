@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -31,7 +32,7 @@ fun InstallationScreen() {
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text(
-            text = "Aquí tienes los datos de tu instalación fotovoltaica en tiempo real.",
+            text = stringResource(R.string.smartSolar_installation_title),
             modifier = Modifier.padding(bottom = 28.dp)
         )
         Text(text = buildAnnotatedString {
@@ -67,7 +68,9 @@ fun EnergyScreen() {
             contentDescription = null
         )
         Box(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp, vertical = 20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 30.dp, vertical = 20.dp),
             contentAlignment = Alignment.BottomStart
         ) {
             Text(
@@ -81,7 +84,9 @@ fun EnergyScreen() {
 @Composable
 fun DetailsScreen() {
     Column(
-        modifier = Modifier.fillMaxSize().padding(10.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(10.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         BaseReadOnlyTextField(

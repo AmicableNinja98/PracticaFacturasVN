@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="factura_list_title">Facturas</string>
+    <string name="popUp_title">Informacion</string>
+    <string name="popUp_message">Esta funcionalidad aún no está disponible</string>
+    <string name="close_popUp">Cerrar</string>
+    <string name="loading_screen_title">Cargando facturas...</string>
+    <string name="filter_popUp_title">No hay facturas</string>
+    <string name="filter_popUp_message">No se han encontrado facturas que se correspondan a esos filtros</string>
+    <string name="filter_screen_title">Filtrar Facturas</string>
+    <string name="filter_date_title">Con fecha de emisión</string>
+    <string name="filter_startDate_title">Desde:</string>
+    <string name="filter_date_button_text">día/mes/año</string>
+    <string name="filter_endDate_title">Hasta:</string>
+    <string name="filter_checkBox_title">Por estado</string>
+    <string name="filter_importe_title">Por un importe</string>
+    <string name="filter_applyButton_text">Aplicar</string>
+    <string name="filter_resetButton_text">Eliminar filtros</string>
+    <string name="filter_popUp_confirm_text">Confirmar</string>
+    <string name="filter_popUp_close_text">Cerrar</string>
+    <string name="smartSolar_installation_title">Aquí tienes los datos de tu instalación fotovoltaica en tiempo real.</string>
+</resources>
