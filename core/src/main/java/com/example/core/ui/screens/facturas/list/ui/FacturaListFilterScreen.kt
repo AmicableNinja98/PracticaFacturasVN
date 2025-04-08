@@ -4,7 +4,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -22,7 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SliderColors
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
@@ -99,17 +101,6 @@ fun FacturaListFilterScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goBack: () -> Unit ,modifier: Modifier) {
-    var selectedSliderValue = remember {
-        mutableStateOf(
-            0f..facturaListFilterViewModel.state.importeMax.toFloat()
-        )
-    }
-    var sliderRange = 0f..facturaListFilterViewModel.state.importeMax.toFloat()
-    val openDialogFirstDate = remember { mutableStateOf(false) }
-    val openDialogSecondDate = remember { mutableStateOf(false) }
-    val datePickerFirstDateState = rememberDatePickerState()
-    val datePickerSecondDateState = rememberDatePickerState()
-
     Column(
         modifier = modifier
             .padding(20.dp)
@@ -126,170 +117,182 @@ fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goB
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
         )
-        Row(
-            modifier = Modifier.padding(vertical = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text(text = "Desde:")
-                Button(
-                    onClick = {
-                        openDialogFirstDate.value = true
-                    },
-                    colors = ButtonColors(
-                        containerColor = colorResource(R.color.light_gray),
-                        contentColor = Color.Black,
-                        disabledContainerColor = Color.LightGray,
-                        disabledContentColor = Color.LightGray
-                    )
-                ) {
-                    Text(facturaListFilterViewModel.state.fechaInicio ?: "día/mes/año")
-                }
-            }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text(text = "Hasta:")
-                Button(
-                    onClick = {
-                        openDialogSecondDate.value = true
-                    },
-                    colors = ButtonColors(
-                        containerColor = colorResource(R.color.light_gray),
-                        contentColor = Color.Black,
-                        disabledContainerColor = Color.LightGray,
-                        disabledContentColor = Color.LightGray
-                    )
-                ) {
-                    Text(facturaListFilterViewModel.state.fechaFin ?: "día/mes/año")
-                }
-            }
-        }
-        if(openDialogFirstDate.value){
-            FacturaDatePicker(
-                onDismissRequest = {
-                    openDialogFirstDate.value = false
-                },
-                onClick = {
-                    facturaListFilterViewModel.onStartDateChanged(datePickerFirstDateState.selectedDateMillis)
-                    openDialogFirstDate.value = false
-                },
-                datePickerState = datePickerFirstDateState
-            )
-        }
-        if(openDialogSecondDate.value){
-            FacturaDatePicker(
-                onDismissRequest = {
-                    openDialogSecondDate.value = false
-                },
-                onClick = {
-                    facturaListFilterViewModel.onEndDateChanged(datePickerSecondDateState.selectedDateMillis)
-                    openDialogSecondDate.value = false
-                },
-                datePickerState = datePickerSecondDateState
-            )
-        }
+        SeccionFechas(facturaListFilterViewModel)
         HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(vertical = 15.dp))
-        Text(
-            text = "Por un importe",
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "${"%.2f".format(facturaListFilterViewModel.state.importeMin)} € - ${"%.2f".format(facturaListFilterViewModel.state.importeMax)} €",
-                color = colorResource(R.color.light_orange)
-            )
-        }
-        RangeSlider(
-            value = selectedSliderValue.value,
-            modifier = Modifier.padding(16.dp),
-            onValueChange = { values ->
-                selectedSliderValue.value = values
-                facturaListFilterViewModel.onSliderValueChange(values)
-            },
-            valueRange = sliderRange,
-            steps = 5,
-            colors = SliderColors(
-                thumbColor = colorResource(R.color.dark_orange),
-                activeTrackColor = colorResource(R.color.dark_orange),
-                activeTickColor = colorResource(R.color.dark_orange),
-                inactiveTrackColor = Color.LightGray,
-                inactiveTickColor = Color.LightGray,
-                disabledThumbColor = Color.LightGray,
-                disabledActiveTrackColor = Color.LightGray,
-                disabledActiveTickColor = Color.LightGray,
-                disabledInactiveTrackColor = Color.LightGray,
-                disabledInactiveTickColor = Color.LightGray,
-            )
-        )
+        SeccionSlider(facturaListFilterViewModel)
         HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(vertical = 15.dp))
-        Text(
-            text = "Por estado",
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
-        )
-        facturaListFilterViewModel.state.estados.keys.forEach {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Checkbox(
-                    checked = facturaListFilterViewModel.state.estados.getValue(it),
-                    onCheckedChange = { value ->
-                        facturaListFilterViewModel.onCheckedChange(it)
-                    }
+        SeccionCheckBox(facturaListFilterViewModel)
+        SeccionBotones(facturaListFilterViewModel,goBack)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel){
+    val openDialogFirstDate = remember { mutableStateOf(false) }
+    val openDialogSecondDate = remember { mutableStateOf(false) }
+    val datePickerFirstDateState = rememberDatePickerState()
+    val datePickerSecondDateState = rememberDatePickerState()
+
+    Row(
+        modifier = Modifier.padding(vertical = 20.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Text(text = "Desde:")
+            Button(
+                onClick = {
+                    openDialogFirstDate.value = true
+                },
+                colors = ButtonColors(
+                    containerColor = colorResource(R.color.light_gray),
+                    contentColor = Color.Black,
+                    disabledContainerColor = Color.LightGray,
+                    disabledContentColor = Color.LightGray
                 )
-                Text(it)
+            ) {
+                Text(facturaListFilterViewModel.state.fechaInicio ?: "día/mes/año")
             }
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 30.dp),
-            contentAlignment = Alignment.Center
+        Column(
+            verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            Text(text = "Hasta:")
+            Button(
+                onClick = {
+                    openDialogSecondDate.value = true
+                },
+                colors = ButtonColors(
+                    containerColor = colorResource(R.color.light_gray),
+                    contentColor = Color.Black,
+                    disabledContainerColor = Color.LightGray,
+                    disabledContentColor = Color.LightGray
+                )
             ) {
-                Button(
-                    onClick = {
-                        facturaListFilterViewModel.onApplyFiltersClick()
-                        if(!facturaListFilterViewModel.state.sinDatos){
-                            goBack()
-                        }
-                    },
-                    colors = ButtonColors(
-                        containerColor = colorResource(R.color.green_button),
-                        contentColor = Color.White,
-                        disabledContainerColor = Color.LightGray,
-                        disabledContentColor = Color.LightGray
-                    ),
-                    modifier = Modifier.width(200.dp)
-                ) {
-                    Text("Aplicar")
+                Text(facturaListFilterViewModel.state.fechaFin ?: "día/mes/año")
+            }
+        }
+    }
+    if(openDialogFirstDate.value){
+        FacturaDatePicker(
+            onDismissRequest = {
+                openDialogFirstDate.value = false
+            },
+            onClick = {
+                facturaListFilterViewModel.onStartDateChanged(datePickerFirstDateState.selectedDateMillis)
+                openDialogFirstDate.value = false
+            },
+            datePickerState = datePickerFirstDateState
+        )
+    }
+    if(openDialogSecondDate.value){
+        FacturaDatePicker(
+            onDismissRequest = {
+                openDialogSecondDate.value = false
+            },
+            onClick = {
+                facturaListFilterViewModel.onEndDateChanged(datePickerSecondDateState.selectedDateMillis)
+                openDialogSecondDate.value = false
+            },
+            datePickerState = datePickerSecondDateState
+        )
+    }
+}
+
+@Composable
+fun SeccionCheckBox(facturaListFilterViewModel: FacturaListFilterViewModel){
+    Text(
+        text = "Por estado",
+        fontWeight = FontWeight.Bold,
+        fontSize = 16.sp,
+    )
+    facturaListFilterViewModel.state.estados.keys.forEach {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = facturaListFilterViewModel.state.estados.getValue(it),
+                onCheckedChange = { value ->
+                    facturaListFilterViewModel.onCheckedChange(it)
                 }
-                Button(
-                    onClick = {
-                        facturaListFilterViewModel.onFiltersReset()
-                    },
-                    colors = ButtonColors(
-                        containerColor = Color.Gray,
-                        contentColor = Color.White,
-                        disabledContainerColor = Color.LightGray,
-                        disabledContentColor = Color.LightGray
-                    ),
-                    modifier = Modifier.width(200.dp)
-                ) {
-                    Text("Eliminar filtros")
-                }
+            )
+            Text(it)
+        }
+    }
+}
+
+@Composable
+fun SeccionSlider(facturaListFilterViewModel : FacturaListFilterViewModel){
+    Text(
+        text = "Por un importe",
+        fontWeight = FontWeight.Bold,
+        fontSize = 16.sp,
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "${"%.2f".format(facturaListFilterViewModel.state.importeMin)} € - ${"%.2f".format(facturaListFilterViewModel.state.importeMax)} €",
+            color = colorResource(R.color.light_orange)
+        )
+    }
+    ImporteSlider(
+        sliderValues = facturaListFilterViewModel.state.importeMin.toFloat()..facturaListFilterViewModel.state.importeMax.toFloat(),
+        importeMinAbsoluto = facturaListFilterViewModel.state.facturas.minOfOrNull { it.importeOrdenacion }?.toFloat() ?: 0f,
+        importeMaxAbsoluto = facturaListFilterViewModel.state.facturas.maxOfOrNull { it.importeOrdenacion }?.toFloat() ?: 0f,
+        onValueChange = { range ->
+            facturaListFilterViewModel.onSliderValueChange(range)
+        }
+    )
+}
+
+@Composable
+fun SeccionBotones(facturaListFilterViewModel: FacturaListFilterViewModel,goBack: () -> Unit){
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 30.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Button(
+                onClick = {
+                    facturaListFilterViewModel.onApplyFiltersClick()
+                    if(!facturaListFilterViewModel.state.sinDatos){
+                        goBack()
+                    }
+                },
+                colors = ButtonColors(
+                    containerColor = colorResource(R.color.green_button),
+                    contentColor = Color.White,
+                    disabledContainerColor = Color.LightGray,
+                    disabledContentColor = Color.LightGray
+                ),
+                modifier = Modifier.width(200.dp)
+            ) {
+                Text("Aplicar")
+            }
+            Button(
+                onClick = {
+                    facturaListFilterViewModel.onFiltersReset()
+                },
+                colors = ButtonColors(
+                    containerColor = Color.Gray,
+                    contentColor = Color.White,
+                    disabledContainerColor = Color.LightGray,
+                    disabledContentColor = Color.LightGray
+                ),
+                modifier = Modifier.width(200.dp)
+            ) {
+                Text("Eliminar filtros")
             }
         }
     }
@@ -313,6 +316,56 @@ fun FacturaDatePicker(onDismissRequest: () -> Unit,onClick : () -> Unit,datePick
         )
     }
 }
+
+@Composable
+fun ImporteSlider(
+    sliderValues: ClosedFloatingPointRange<Float>,
+    importeMaxAbsoluto: Float,
+    importeMinAbsoluto: Float,
+    onValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
+    modifier: Modifier = Modifier,
+    steps: Int = 5
+) {
+    val sliderRange = importeMinAbsoluto..importeMaxAbsoluto
+
+    Column(modifier = modifier.padding(horizontal = 16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "${"%.2f".format(importeMinAbsoluto)} €",
+                color = Color.LightGray
+            )
+            Text(
+                text = "${"%.2f".format(importeMaxAbsoluto)} €",
+                color = Color.LightGray
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        RangeSlider(
+            value = sliderValues,
+            onValueChange = onValueChange,
+            valueRange = sliderRange,
+            steps = steps,
+            colors = SliderDefaults.colors(
+                thumbColor = colorResource(id = R.color.dark_orange),
+                activeTrackColor = colorResource(id = R.color.dark_orange),
+                activeTickColor = colorResource(id = R.color.dark_orange),
+                inactiveTrackColor = Color.LightGray,
+                inactiveTickColor = Color.LightGray,
+                disabledThumbColor = Color.LightGray,
+                disabledActiveTrackColor = Color.LightGray,
+                disabledActiveTickColor = Color.LightGray,
+                disabledInactiveTrackColor = Color.LightGray,
+                disabledInactiveTickColor = Color.LightGray,
+            )
+        )
+    }
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
