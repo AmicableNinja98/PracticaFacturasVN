@@ -4,12 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Checkbox
@@ -28,10 +28,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import com.example.core.R
 import com.example.core.ui.screens.facturas.list.usecase.FacturaListFilterViewModel
 
@@ -48,16 +47,22 @@ fun FacturaListFilterHost(
     facturaListFilterViewModel: FacturaListFilterViewModel,
     goBack: () -> Unit
 ) {
+    val openDialog = remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        facturaListFilterViewModel.getFacturasFromRepo()
+        facturaListFilterViewModel.getFacturasFromRepository()
     }
 
     if (facturaListFilterViewModel.state.sinDatos) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text("No hay facturas para filtrar")
+        openDialog.value = true
+        if(openDialog.value){
+            NoDataFilterPopUp(
+                title = "Sin facturas",
+                message = "No se han encontrado facturas que se correspondan a esos filtros",
+                onDismiss = {
+                    openDialog.value = false
+                    facturaListFilterViewModel.onFiltersReset()
+                }
+            )
         }
     } else {
         FacturaListFilterScreen(facturaListFilterViewModel, goBack)
@@ -257,7 +262,9 @@ fun FacturaListFilter(facturaListFilterViewModel: FacturaListFilterViewModel,goB
                 Button(
                     onClick = {
                         facturaListFilterViewModel.onApplyFiltersClick()
-                        goBack()
+                        if(!facturaListFilterViewModel.state.sinDatos){
+                            goBack()
+                        }
                     },
                     colors = ButtonColors(
                         containerColor = colorResource(R.color.green_button),
@@ -305,4 +312,29 @@ fun FacturaDatePicker(onDismissRequest: () -> Unit,onClick : () -> Unit,datePick
             state = datePickerState
         )
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun NoDataFilterPopUp(title: String, message: String, onDismiss: () -> Unit) {
+    AlertDialog(
+        title = {
+            Text(title)
+        },
+        onDismissRequest = {},
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false
+        ),
+        text = {
+            Text(message)
+        },
+        confirmButton = {
+            Button(
+                onClick = onDismiss
+            ) {
+                Text("Cerrar")
+            }
+        }
+    )
 }

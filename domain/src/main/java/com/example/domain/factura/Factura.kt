@@ -12,8 +12,8 @@ import androidx.room.PrimaryKey
  */
 @Entity
 data class Factura(
-    @PrimaryKey
-    var id : Int = -1,
+    @PrimaryKey(autoGenerate = true)
+    val id : Int = 0,
     val descEstado : String,
     val importeOrdenacion : Double,
     val fecha : String

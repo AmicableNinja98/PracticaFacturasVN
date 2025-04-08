@@ -1,8 +1,9 @@
 package com.example.data_retrofit.repository
 
-import androidx.compose.runtime.mutableStateMapOf
+import android.util.Log
 import com.example.data_retrofit.database.FacturaDao
 import com.example.data_retrofit.services.FacturaApiService
+import com.example.data_retrofit.services.RetromockService
 import com.example.domain.factura.Factura
 import com.example.domain.factura_response.FacturaApi
 import javax.inject.Inject
@@ -12,35 +13,25 @@ import javax.inject.Inject
  * @param facturaApiService -> Api a usar para recoger los datos.
  * @param facturaDao -> Dao que usaremos para guardar los datos recogidos de la api en la base de datos local.
  */
-class FacturaRepository @Inject constructor(private val facturaApiService: FacturaApiService,private val facturaDao: FacturaDao) {
+class FacturaRepository @Inject constructor(private val facturaApiService: FacturaApiService,private val retromockService: RetromockService,private val facturaDao: FacturaDao) {
 
-    /*init {
-        runBlocking {
-            val response = getFacturasFromApi()
-            if(response.isSuccessful){
-                val body = response.body()
-                if(body != null && *//*body.numFacturas > 0 &&*//* body.facturas.isNotEmpty())
-                    body.facturas.forEach {
-                        factura -> insertFactura(factura)
-                    }
-            }
-        }
-    }*/
+    suspend fun getFacturasFromApi() = facturaApiService.getFacturas()
 
-    /*init {
-        runBlocking {
-            val response = getFacturasFromApi()
-            if(response.facturas.isNotEmpty())
-                response.facturas.forEach {
-                    factura -> insertFactura(factura)
+    suspend fun getFacturasFromMock() = retromockService.getFacturasMock()
+
+    suspend fun getData(){
+        Log.i("INFO MOCK","RECOGIENDO DATOS")
+        var response = getFacturasFromApi()
+        if(response.isSuccessful){
+            Log.i("INFO MOCK","DATOS RECOGIDOS")
+            val body = response.body()
+            if(body != null && body.numFacturas > 0 && body.facturas.isNotEmpty())
+                body.facturas.forEach {
+                        factura ->
+                    insertFactura(factura)
                 }
         }
-    }*/
-
-    /**
-     * Recoge las facturas de la api.
-     */
-    suspend fun getFacturasFromApi() = facturaApiService.getFacturas()
+    }
 
     /**
      * Recoge las facturas de la base de datos.
@@ -53,7 +44,6 @@ class FacturaRepository @Inject constructor(private val facturaApiService: Factu
      */
     suspend fun insertFactura(facturaApi: FacturaApi){
         facturaDao.insertFactura(Factura(
-            id = getLastFacturaId(),
             descEstado = facturaApi.descEstado,
             importeOrdenacion = facturaApi.importeOrdenacion,
             fecha = facturaApi.fecha
@@ -76,12 +66,8 @@ class FacturaRepository @Inject constructor(private val facturaApiService: Factu
      * Recoge una factura de la base de datos.
      * @param id -> Id de la factura a recoger.
      */
-    //suspend fun getFacturaById(id : Int) = facturaDao.getFacturaById(id)
+    suspend fun getFacturaById(id : Int) = facturaDao.getFacturaById(id)
 
-    /**
-     * Recoge el último id de una factura registrado en la base de datos.
-     */
-    suspend fun getLastFacturaId() = facturaDao.getLastFacturaId()
 
     companion object{
         private var idList : MutableList<Int> = mutableListOf()

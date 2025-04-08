@@ -22,6 +22,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
     const val BASE_URL = "https://viewnextandroid.wiremockapi.cloud/"
+    const val BASE_POSTMAN_URL = "https://adf8ae8e-69de-4fc2-b42b-fdb5ff4cbe3b.mock.pstmn.io/"
     /*val json = Json {
         ignoreUnknownKeys = true
     }*/
@@ -32,7 +33,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideRetrofit(): Retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(BASE_POSTMAN_URL)
         .addConverterFactory(CustomKotlinSerializationConverter())
         .build()
 

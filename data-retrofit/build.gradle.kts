@@ -40,7 +40,10 @@ dependencies {
     implementation(libs.retrofit2.kotlinx.serialization.converter)
     implementation(libs.retrofit)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.kotlinx.serialization.core.jvm)
     implementation (libs.converter.scalars)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
 
     //Room
     implementation(libs.androidx.room.runtime)

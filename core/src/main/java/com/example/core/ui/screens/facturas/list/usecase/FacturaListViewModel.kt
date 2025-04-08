@@ -2,7 +2,6 @@ package com.example.core.ui.screens.facturas.list.usecase
 
 import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -20,32 +19,35 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
         private set
 
     fun getFacturas() {
-        /*viewModelScope.launch {
+        viewModelScope.launch {
             state = FacturaListState.Loading
-            facturaRepository.getFacturasFromDatabase().collect {
-                facturas ->
-                state = if(facturas.isEmpty())
-                    FacturaListState.NoData
-                else
+            if (FacturaRepository.getFiltersApplied()) {
+                val facturas = mutableListOf<Factura>()
+                FacturaRepository.getIds().forEach { id ->
+                    facturas.add(facturaRepository.getFacturaById(id)!!)
+                }
+                Log.i("INFO FACTURAS FILTRO", facturas.joinToString(","))
+                state = if (facturas.isNotEmpty())
                     FacturaListState.Success(facturas)
+                else
+                    FacturaListState.NoData
+            } else {
+                facturaRepository.getFacturasFromDatabase().collect {
+                        facturas ->
+                    if(facturas.isEmpty()){
+                        facturaRepository.getData()
+                        facturaRepository.getFacturasFromDatabase().collect{
+                                facturas ->
+                            state = if(facturas.isEmpty())
+                                FacturaListState.NoData
+                            else
+                                FacturaListState.Success(facturas)
+                        }
+                    }
+                    else
+                        state = FacturaListState.Success(facturas)
+                }
             }
-        }*/
-        if (FacturaRepository.getFiltersApplied()) {
-            val facturas = mutableStateListOf<Factura>()
-            FacturaRepository.getIds().forEach {
-                facturas.add(FacturaRepository.getFacturaById(it)!!)
-            }
-            Log.i("INFO FACTURAS FILTRO", facturas.joinToString(","))
-            state = if (facturas.isNotEmpty())
-                FacturaListState.Success(facturas)
-            else
-                FacturaListState.NoData
-        } else {
-            val facturas = FacturaRepository.getFacturas()
-            Log.i("INFO NO FILTRO", facturas.joinToString(","))
-            state = FacturaListState.Success(
-                facturas.toMutableList()
-            )
         }
     }
 

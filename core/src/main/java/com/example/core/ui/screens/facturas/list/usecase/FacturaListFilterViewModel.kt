@@ -1,21 +1,21 @@
 package com.example.core.ui.screens.facturas.list.usecase
 
-import android.util.Log
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.data_retrofit.repository.FacturaRepository
 import com.example.domain.factura.Factura
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
-class FacturaListFilterViewModel @Inject constructor() : ViewModel() {
+class FacturaListFilterViewModel @Inject constructor(val facturaRepository: FacturaRepository) : ViewModel() {
     var state by mutableStateOf<FacturaListFilterState>(FacturaListFilterState())
         private set
 
@@ -23,27 +23,23 @@ class FacturaListFilterViewModel @Inject constructor() : ViewModel() {
 
     private var format = "dd/MM/yyyy"
 
-    init {
-        facturasOriginal = FacturaRepository.getFacturas().toMutableList()
-    }
-
-    fun getFacturasFromRepo() {
-        val facturasRepo = mutableStateListOf<Factura>()
-        FacturaRepository.getIds().forEach {
-            facturasRepo.add(FacturaRepository.getFacturaById(it)!!)
+    fun getFacturasFromRepository() {
+        viewModelScope.launch {
+            facturaRepository.getFacturasFromDatabase().collect {
+                facturas ->
+                if(facturas.isNotEmpty()) {
+                    updateStateAfterInit(facturas.toMutableList())
+                    facturasOriginal = facturas.toMutableList()
+                }
+            }
         }
-        if (facturasRepo.isNotEmpty())
-            updateStateAfterInit(facturasRepo)
-        else if (FacturaRepository.getFiltersApplied())
-            updateStateAfterInit(facturasOriginal)
     }
 
     private fun updateStateAfterInit(facturas : MutableList<Factura>){
         state = state.copy(
             facturas = facturas,
             importeMin = facturas.minOf { it.importeOrdenacion },
-            importeMax = facturas.maxOf { it.importeOrdenacion },
-            sinDatos = false
+            importeMax = facturas.maxOf { it.importeOrdenacion }
         )
     }
 
@@ -83,6 +79,12 @@ class FacturaListFilterViewModel @Inject constructor() : ViewModel() {
     }
 
     fun onFiltersReset() {
+        resetState()
+        FacturaRepository.setFiltersApplied(false)
+
+    }
+
+    private fun resetState(){
         val estados = state.estados
         estados.keys.forEach {
             state.estados.put(it, false)
@@ -95,32 +97,25 @@ class FacturaListFilterViewModel @Inject constructor() : ViewModel() {
             importeMax = facturasOriginal.maxOf { it.importeOrdenacion },
             filtroImporteAplicado = false,
             filtroFechaAplicado = false,
-            filtroEstadoAplicado = false
+            filtroEstadoAplicado = false,
+            sinDatos = false
         )
-        FacturaRepository.setFiltersApplied(false)
-
     }
 
     fun onApplyFiltersClick() {
         if (state.filtroEstadoAplicado || state.filtroImporteAplicado || state.filtroFechaAplicado) {
-            state = state.copy(facturas = applyFilters())
+            val facturasFiltradas = applyFilters()
+            if(facturasFiltradas.isNotEmpty()){
+                state = state.copy(facturas = facturasFiltradas, sinDatos = false)
 
-            Log.i(
-                "INFO PRECIOS SELECCIONADOS",
-                "Minimo: ${state.importeMin} Máximo: ${state.importeMax}"
-            )
-            Log.i("INFO FILTRO", state.facturas.joinToString(","))
+                FacturaRepository.setFiltersApplied(true)
+                FacturaRepository.setIds(state.facturas.map {
+                    it.id
+                }.toMutableList())
+            }
+            else
+                state = state.copy(sinDatos = true)
 
-            FacturaRepository.setFiltersApplied(true)
-            FacturaRepository.setIds(state.facturas.map {
-                it.id
-            }.toMutableList())
-
-            state = state.copy(
-                filtroImporteAplicado = false,
-                filtroFechaAplicado = false,
-                filtroEstadoAplicado = false
-            )
         } else
             sendAllIds()
     }
