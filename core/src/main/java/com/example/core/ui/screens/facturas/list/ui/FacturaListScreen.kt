@@ -45,7 +45,7 @@ import com.example.ui.base.composables.NoDataScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacturaListScreenHost(facturaListViewModel: FacturaListViewModel,sharedViewModel: FacturaSharedViewModel ,goToFilter: () -> Unit) {
+fun FacturaListScreenHost(facturaListViewModel: FacturaListViewModel,sharedViewModel: FacturaSharedViewModel ,goToFilter: () -> Unit,goBack: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -57,7 +57,7 @@ fun FacturaListScreenHost(facturaListViewModel: FacturaListViewModel,sharedViewM
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = {}
+                        onClick = goBack
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.KeyboardArrowLeft,

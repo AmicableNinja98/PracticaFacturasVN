@@ -6,9 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-//import com.example.core.ui.screens.smartSolar.SmartSolarScreen
-import com.example.practicafacturas.navigation.FacturaNavGraph
-import com.example.practicafacturas.navigation.facturaGraph
+import com.example.practicafacturas.navigation.AppNavGraph
+import com.example.practicafacturas.navigation.appGraph
 import com.example.practicafacturas.theme.PracticaFacturasTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,11 +21,10 @@ class MainActivity : ComponentActivity() {
             PracticaFacturasTheme {
                 NavHost(
                     navController = navController,
-                    startDestination = FacturaNavGraph.ROUTE
+                    startDestination = AppNavGraph.ROOT
                 ){
-                    facturaGraph(navController)
+                    appGraph(navController)
                 }
-                //SmartSolarScreen()
             }
         }
     }

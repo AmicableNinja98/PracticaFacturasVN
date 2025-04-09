@@ -32,7 +32,7 @@ import com.example.core.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SmartSolarScreen() {
+fun SmartSolarScreen(goBack : () -> Unit) {
     var tabIndex by remember { mutableIntStateOf(0) }
     val tabData = listOf("Mi instalación", "Energía", "Detalles")
     val pagerState = rememberPagerState { tabData.size }
@@ -45,7 +45,7 @@ fun SmartSolarScreen() {
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = {}
+                        onClick = goBack
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.KeyboardArrowLeft,

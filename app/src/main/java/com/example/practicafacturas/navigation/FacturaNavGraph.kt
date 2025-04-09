@@ -8,37 +8,33 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.core.ui.screens.facturas.list.ui.FacturaListFilterHost
 import com.example.core.ui.screens.facturas.list.ui.FacturaListScreenHost
+import com.example.core.ui.screens.facturas.list.usecase.FacturaSharedViewModel
 import com.example.core.ui.screens.facturas.list.usecase.filter.FacturaListFilterViewModel
 import com.example.core.ui.screens.facturas.list.usecase.list.FacturaListViewModel
-import com.example.core.ui.screens.facturas.list.usecase.FacturaSharedViewModel
-
-object FacturaNavGraph {
-    const val ROUTE = "factura"
-    fun list() = "$ROUTE/list"
-    fun filter() = "$ROUTE/filter"
-}
 
 fun NavGraphBuilder.facturaGraph(navController: NavController) {
-    navigation(startDestination = FacturaNavGraph.list(), route = FacturaNavGraph.ROUTE) {
+    navigation(startDestination = AppNavGraph.FACTURA_LIST, route = AppNavGraph.FACTURA) {
         list(navController)
         filter(navController)
     }
 }
 
 private fun NavGraphBuilder.list(navController: NavController) {
-    composable(route = FacturaNavGraph.list()) { backStackEntry ->
+    composable(route = AppNavGraph.FACTURA_LIST) { backStackEntry ->
         val parentEntry =
-            remember(backStackEntry) { navController.getBackStackEntry(FacturaNavGraph.ROUTE) }
+            remember(backStackEntry) { navController.getBackStackEntry(AppNavGraph.FACTURA) }
         val sharedViewModel = hiltViewModel<FacturaSharedViewModel>(parentEntry)
         FacturaListScreenHost(hiltViewModel<FacturaListViewModel>(), sharedViewModel, goToFilter = {
-            navController.navigate(FacturaNavGraph.filter())
+            navController.navigate(AppNavGraph.FACTURA_FILTER)
+        },goBack = {
+            navController.popBackStack()
         })
     }
 }
 
 private fun NavGraphBuilder.filter(navController: NavController) {
-    composable(route = FacturaNavGraph.filter()) { backStackEntry ->
-        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(FacturaNavGraph.ROUTE) }
+    composable(route = AppNavGraph.FACTURA_FILTER) { backStackEntry ->
+        val parentEntry = remember(backStackEntry) { navController.getBackStackEntry(AppNavGraph.FACTURA) }
         val sharedViewModel = hiltViewModel<FacturaSharedViewModel>(parentEntry)
         FacturaListFilterHost(
             hiltViewModel<FacturaListFilterViewModel>(),
