@@ -19,4 +19,11 @@
     <string name="filter_popUp_confirm_text">Confirmar</string>
     <string name="filter_popUp_close_text">Cerrar</string>
     <string name="smartSolar_installation_title">Aquí tienes los datos de tu instalación fotovoltaica en tiempo real.</string>
+    <string name="smartSolar_energy_screen_text">Estamos trabajando en mejorar la App.Tus paneles solares siguen produciendo,en breve podrás seguir viendo tu producción solar. Sentimos las molestias.</string>
+    <string name="smartSolar_details_code_field_title">CAU(Código Autoconsumo)</string>
+    <string name="smartSolar_details_request_status_title">Estado solicitud alta consumidor</string>
+    <string name="smartSolar_details_type_title">Tipo autoconsumo</string>
+    <string name="smartSolar_details_compensation_field_title">Compensación de excedentes</string>
+    <string name="smartSolar_details_power_field_title">Potencia de instalación</string>
+    <string name="facturaList_screen_appbar_title">Consumo</string>
 </resources>

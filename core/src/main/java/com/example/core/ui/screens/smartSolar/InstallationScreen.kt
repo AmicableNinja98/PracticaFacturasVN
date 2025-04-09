@@ -74,8 +74,7 @@ fun EnergyScreen() {
             contentAlignment = Alignment.BottomStart
         ) {
             Text(
-                text = "Estamos trabajando en mejorar la App.Tus paneles solares siguen produciendo," +
-                        " en breve podrás seguir viendo tu producción solar. Sentimos las molestias."
+                text = stringResource(R.string.smartSolar_energy_screen_text)
             )
         }
     }
@@ -90,23 +89,23 @@ fun DetailsScreen() {
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         BaseReadOnlyTextField(
-            title = "CAU(Código Autoconsumo)",
+            title = stringResource(R.string.smartSolar_details_code_field_title),
             input = ""
         )
         BaseReadOnlyTextField(
-            title = "Estado solicitud alta consumidor",
+            title = stringResource(R.string.smartSolar_details_request_status_title),
             input = ""
         )
         BaseReadOnlyTextField(
-            title = "Tipo autoconsumo",
+            title = stringResource(R.string.smartSolar_details_type_title),
             input = ""
         )
         BaseReadOnlyTextField(
-            title = "Compensación de excedentes",
+            title = stringResource(R.string.smartSolar_details_compensation_field_title),
             input = ""
         )
         BaseReadOnlyTextField(
-            title = "Potencia de instalación",
+            title = stringResource(R.string.smartSolar_details_power_field_title),
             input = ""
         )
     }

@@ -43,12 +43,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.core.R
-import com.example.core.ui.screens.facturas.list.usecase.FacturaListFilterViewModel
+import com.example.core.ui.screens.facturas.list.usecase.filter.FacturaListFilterViewModel
+import com.example.core.ui.screens.facturas.list.usecase.FacturaSharedViewModel
 import com.example.ui.base.composables.BaseButton
 
 @Composable
 fun FacturaListFilterHost(
     facturaListFilterViewModel: FacturaListFilterViewModel,
+    facturaSharedViewModel: FacturaSharedViewModel,
     goBack: () -> Unit
 ) {
     val openDialog = remember { mutableStateOf(false) }
@@ -64,12 +66,12 @@ fun FacturaListFilterHost(
                 message = stringResource(R.string.filter_popUp_message),
                 onDismiss = {
                     openDialog.value = false
-                    facturaListFilterViewModel.onFiltersReset()
+                    facturaListFilterViewModel.onFiltersReset(facturaSharedViewModel)
                 }
             )
         }
     } else {
-        FacturaListFilterScreen(facturaListFilterViewModel, goBack)
+        FacturaListFilterScreen(facturaListFilterViewModel, facturaSharedViewModel, goBack)
     }
 }
 
@@ -77,6 +79,7 @@ fun FacturaListFilterHost(
 @Composable
 fun FacturaListFilterScreen(
     facturaListFilterViewModel: FacturaListFilterViewModel,
+    facturaSharedViewModel: FacturaSharedViewModel,
     goBack: () -> Unit
 ) {
     Scaffold(
@@ -96,7 +99,12 @@ fun FacturaListFilterScreen(
             )
         }
     ) { innerPadding ->
-        FacturaListFilter(facturaListFilterViewModel, goBack, Modifier.padding(innerPadding))
+        FacturaListFilter(
+            facturaListFilterViewModel,
+            facturaSharedViewModel,
+            goBack,
+            Modifier.padding(innerPadding)
+        )
     }
 }
 
@@ -104,6 +112,7 @@ fun FacturaListFilterScreen(
 @Composable
 fun FacturaListFilter(
     facturaListFilterViewModel: FacturaListFilterViewModel,
+    facturaSharedViewModel: FacturaSharedViewModel,
     goBack: () -> Unit,
     modifier: Modifier
 ) {
@@ -128,7 +137,7 @@ fun FacturaListFilter(
         SeccionSlider(facturaListFilterViewModel)
         HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(vertical = 15.dp))
         SeccionCheckBox(facturaListFilterViewModel)
-        SeccionBotones(facturaListFilterViewModel, goBack)
+        SeccionBotones(facturaListFilterViewModel, facturaSharedViewModel, goBack)
     }
 }
 
@@ -149,7 +158,8 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
         ) {
             Text(text = stringResource(R.string.filter_startDate_title))
             BaseButton(
-                text = facturaListFilterViewModel.state.fechaInicio ?: stringResource(R.string.filter_date_button_text),
+                text = facturaListFilterViewModel.state.fechaInicio
+                    ?: stringResource(R.string.filter_date_button_text),
                 onClick = {
                     openDialogFirstDate.value = true
                 },
@@ -166,7 +176,8 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
         ) {
             Text(text = stringResource(R.string.filter_endDate_title))
             BaseButton(
-                text = facturaListFilterViewModel.state.fechaFin ?: stringResource(R.string.filter_date_button_text),
+                text = facturaListFilterViewModel.state.fechaFin
+                    ?: stringResource(R.string.filter_date_button_text),
                 onClick = {
                     openDialogSecondDate.value = true
                 },
@@ -251,19 +262,16 @@ fun SeccionSlider(facturaListFilterViewModel: FacturaListFilterViewModel) {
         )
     }
     ImporteSlider(
-        sliderValues = facturaListFilterViewModel.state.importeMin.toFloat()..facturaListFilterViewModel.state.importeMax.toFloat(),
-        importeMinAbsoluto = facturaListFilterViewModel.state.facturas.minOfOrNull { it.importeOrdenacion }
-            ?.toFloat() ?: 0f,
-        importeMaxAbsoluto = facturaListFilterViewModel.state.facturas.maxOfOrNull { it.importeOrdenacion }
-            ?.toFloat() ?: 0f,
-        onValueChange = { range ->
-            facturaListFilterViewModel.onSliderValueChange(range)
-        }
+        facturaListFilterViewModel = facturaListFilterViewModel
     )
 }
 
 @Composable
-fun SeccionBotones(facturaListFilterViewModel: FacturaListFilterViewModel, goBack: () -> Unit) {
+fun SeccionBotones(
+    facturaListFilterViewModel: FacturaListFilterViewModel,
+    sharedViewModel: FacturaSharedViewModel,
+    goBack: () -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -282,7 +290,7 @@ fun SeccionBotones(facturaListFilterViewModel: FacturaListFilterViewModel, goBac
                     disabledContentColor = Color.LightGray
                 ),
                 onClick = {
-                    facturaListFilterViewModel.onApplyFiltersClick()
+                    facturaListFilterViewModel.onApplyFiltersClick(sharedViewModel)
                     if (!facturaListFilterViewModel.state.sinDatos) {
                         goBack()
                     }
@@ -292,7 +300,7 @@ fun SeccionBotones(facturaListFilterViewModel: FacturaListFilterViewModel, goBac
             BaseButton(
                 text = stringResource(R.string.filter_resetButton_text),
                 onClick = {
-                    facturaListFilterViewModel.onFiltersReset()
+                    facturaListFilterViewModel.onFiltersReset(sharedViewModel)
                 },
                 colors = ButtonColors(
                     containerColor = Color.Gray,
@@ -331,13 +339,16 @@ fun FacturaDatePicker(
 
 @Composable
 fun ImporteSlider(
-    sliderValues: ClosedFloatingPointRange<Float>,
-    importeMaxAbsoluto: Float,
-    importeMinAbsoluto: Float,
-    onValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
+    facturaListFilterViewModel: FacturaListFilterViewModel,
     modifier: Modifier = Modifier,
     steps: Int = 5
 ) {
+    val importeMinAbsoluto =
+        facturaListFilterViewModel.state.facturas.minOfOrNull { it.importeOrdenacion }
+            ?.toFloat() ?: 0f
+    val importeMaxAbsoluto =
+        facturaListFilterViewModel.state.facturas.maxOfOrNull { it.importeOrdenacion }
+            ?.toFloat() ?: 0f
     val sliderRange = importeMinAbsoluto..importeMaxAbsoluto
 
     Column(modifier = modifier.padding(horizontal = 16.dp)) {
@@ -358,8 +369,10 @@ fun ImporteSlider(
         Spacer(modifier = Modifier.height(5.dp))
 
         RangeSlider(
-            value = sliderValues,
-            onValueChange = onValueChange,
+            value = facturaListFilterViewModel.state.importeMin.toFloat()..facturaListFilterViewModel.state.importeMax.toFloat(),
+            onValueChange = { range ->
+                facturaListFilterViewModel.onSliderValueChange(range)
+            },
             valueRange = sliderRange,
             steps = steps,
             colors = SliderDefaults.colors(

@@ -36,21 +36,22 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.DialogProperties
 import com.example.core.R
 import com.example.core.extensions.toFormattedDisplayDateOrNull
-import com.example.core.ui.screens.facturas.list.usecase.FacturaListState
-import com.example.core.ui.screens.facturas.list.usecase.FacturaListViewModel
+import com.example.core.ui.screens.facturas.list.usecase.list.FacturaListState
+import com.example.core.ui.screens.facturas.list.usecase.list.FacturaListViewModel
+import com.example.core.ui.screens.facturas.list.usecase.FacturaSharedViewModel
 import com.example.domain.factura.Factura
 import com.example.ui.base.composables.LoadingScreen
 import com.example.ui.base.composables.NoDataScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacturaListScreenHost(facturaListViewModel: FacturaListViewModel, goToFilter: () -> Unit) {
+fun FacturaListScreenHost(facturaListViewModel: FacturaListViewModel,sharedViewModel: FacturaSharedViewModel ,goToFilter: () -> Unit) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        "Consumo",
+                        stringResource(R.string.facturaList_screen_appbar_title),
                         color = colorResource(R.color.light_orange)
                     )
                 },
@@ -68,7 +69,7 @@ fun FacturaListScreenHost(facturaListViewModel: FacturaListViewModel, goToFilter
                 actions = {
                     IconButton(
                         onClick = {
-                            facturaListViewModel.sendIds()
+                            facturaListViewModel.sendIds(sharedViewModel)
                             goToFilter()
                         }
                     ) {
@@ -79,7 +80,7 @@ fun FacturaListScreenHost(facturaListViewModel: FacturaListViewModel, goToFilter
         }
     ) { innerPadding ->
         LaunchedEffect(Unit) {
-            facturaListViewModel.getFacturas()
+            facturaListViewModel.getFacturasFromApiOrDatabase(sharedViewModel)
         }
         when (facturaListViewModel.state) {
             is FacturaListState.Loading -> LoadingScreen(stringResource(R.string.loading_screen_title), modifier = Modifier.padding(innerPadding))

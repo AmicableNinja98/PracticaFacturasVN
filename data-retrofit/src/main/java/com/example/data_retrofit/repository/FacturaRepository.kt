@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 /**
  * Repositorio que se encarga de enlazar los viewModel de la entidad Factura con la api y la base de datos local.
- * @param facturaApiService -> Api a usar para recoger los datos.
+ * @param facturaApiService -> Servicio de donde se recogen los datos.
  * @param facturaDao -> Dao que usaremos para guardar los datos recogidos de la api en la base de datos local.
  */
 class FacturaRepository @Inject constructor(private val facturaApiService: FacturaApiService,private val retromockService: RetromockService,private val facturaDao: FacturaDao) {
@@ -30,9 +30,6 @@ class FacturaRepository @Inject constructor(private val facturaApiService: Factu
         }
     }
 
-    /**
-     * Recoge las facturas de la base de datos.
-     */
     fun getFacturasFromDatabase() = facturaDao.getAllFacturas()
 
     /**
@@ -48,21 +45,4 @@ class FacturaRepository @Inject constructor(private val facturaApiService: Factu
     }
 
     suspend fun getFacturaById(id : Int) = facturaDao.getFacturaById(id)
-
-    companion object{
-        private var idList : MutableList<Int> = mutableListOf()
-        private var filtersApplied = false
-
-        fun getIds() : MutableList<Int> = idList
-
-        fun setIds(ids : MutableList<Int>){
-            idList = ids
-        }
-
-        fun setFiltersApplied(value : Boolean){
-            filtersApplied = value
-        }
-
-        fun getFiltersApplied() = filtersApplied
-    }
 }

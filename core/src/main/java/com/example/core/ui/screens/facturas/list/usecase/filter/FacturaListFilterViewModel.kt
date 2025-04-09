@@ -1,4 +1,4 @@
-package com.example.core.ui.screens.facturas.list.usecase
+package com.example.core.ui.screens.facturas.list.usecase.filter
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.extensions.toLocalDateOrNull
+import com.example.core.ui.screens.facturas.list.usecase.FacturaSharedViewModel
 import com.example.data_retrofit.repository.FacturaRepository
 import com.example.domain.factura.Factura
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -78,13 +79,11 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         )
     }
 
-    fun onFiltersReset() {
-        resetState()
-        FacturaRepository.setFiltersApplied(false)
-
+    fun onFiltersReset(sharedViewModel: FacturaSharedViewModel) {
+        resetState(sharedViewModel)
     }
 
-    private fun resetState(){
+    private fun resetState(sharedViewModel: FacturaSharedViewModel){
         val estados = state.estados
         estados.keys.forEach {
             state.estados.put(it, false)
@@ -100,27 +99,31 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
             filtroEstadoAplicado = false,
             sinDatos = false
         )
+        sharedViewModel.setFilters(false)
     }
 
-    fun onApplyFiltersClick() {
-        if (state.filtroEstadoAplicado || state.filtroImporteAplicado || state.filtroFechaAplicado) {
-            val facturasFiltradas = applyFilters()
-            if(facturasFiltradas.isNotEmpty()){
-                state = state.copy(facturas = facturasFiltradas, sinDatos = false)
-
-                FacturaRepository.setFiltersApplied(true)
-                FacturaRepository.setIds(state.facturas.map {
-                    it.id
-                }.toMutableList())
-            }
-            else
-                state = state.copy(sinDatos = true)
-
-        } else
-            sendAllIds()
+    fun onApplyFiltersClick(sharedViewModel: FacturaSharedViewModel) {
+        if (state.filtroEstadoAplicado || state.filtroImporteAplicado || state.filtroFechaAplicado)
+            applyFiltersAndUpdateState(sharedViewModel)
+        else
+            sendAllIdsToRepository(sharedViewModel)
     }
 
-    private fun applyFilters(): MutableList<Factura> {
+    private fun applyFiltersAndUpdateState(sharedViewModel: FacturaSharedViewModel){
+        val facturasFiltradas = applyFiltersToList()
+        if(facturasFiltradas.isNotEmpty()){
+            state = state.copy(facturas = facturasFiltradas, sinDatos = false)
+
+            sharedViewModel.setFilters(true)
+            sharedViewModel.setIds(state.facturas.map {
+                it.id
+            }.toMutableList())
+        }
+        else
+            state = state.copy(sinDatos = true)
+    }
+
+    private fun applyFiltersToList(): MutableList<Factura> {
         return facturasOriginal.filter { factura ->
             val facturaDate = factura.fecha.replace("/", "-").toLocalDateOrNull()
             val startDate = if (state.fechaInicio != null) state.fechaInicio!!.replace(
@@ -142,8 +145,8 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         }.toMutableList()
     }
 
-    private fun sendAllIds() {
-        FacturaRepository.setIds(facturasOriginal.map {
+    private fun sendAllIdsToRepository(sharedViewModel: FacturaSharedViewModel) {
+        sharedViewModel.setIds(facturasOriginal.map {
             it.id
         }.toMutableList())
     }

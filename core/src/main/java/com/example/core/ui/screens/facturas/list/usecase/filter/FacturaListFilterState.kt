@@ -1,4 +1,4 @@
-package com.example.core.ui.screens.facturas.list.usecase
+package com.example.core.ui.screens.facturas.list.usecase.filter
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
