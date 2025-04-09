@@ -2,7 +2,6 @@ package com.example.data_retrofit.repository
 
 import com.example.data_retrofit.database.FacturaDao
 import com.example.data_retrofit.services.FacturaApiService
-import com.example.data_retrofit.services.RetromockService
 import com.example.domain.factura.Factura
 import com.example.domain.factura_response.FacturaApi
 import javax.inject.Inject
@@ -12,11 +11,11 @@ import javax.inject.Inject
  * @param facturaApiService -> Servicio de donde se recogen los datos.
  * @param facturaDao -> Dao que usaremos para guardar los datos recogidos de la api en la base de datos local.
  */
-class FacturaRepository @Inject constructor(private val facturaApiService: FacturaApiService,private val retromockService: RetromockService,private val facturaDao: FacturaDao) {
+class FacturaRepository @Inject constructor(private val facturaApiService: FacturaApiService, private val facturaDao: FacturaDao) {
 
     suspend fun getFacturasFromApi() = facturaApiService.getFacturas()
 
-    suspend fun getFacturasFromMock() = retromockService.getFacturasMock()
+    //suspend fun getFacturasFromMock() = smartSolarService.getFacturasMock()
 
     suspend fun getDataFromApiAndInsertToDatabase(){
         var response = getFacturasFromApi()

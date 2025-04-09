@@ -1,10 +1,12 @@
 package com.example.practicafacturas.navigation
 
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.core.ui.screens.smartSolar.SmartSolarScreen
+import com.example.core.ui.screens.smartSolar.ui.SmartSolarScreen
+import com.example.core.ui.screens.smartSolar.usecase.SmartSolarScreenViewModel
 import com.example.practicafacturas.home.HomeScreen
 
 object AppNavGraph {
@@ -41,6 +43,7 @@ private fun NavGraphBuilder.home(navController: NavController) {
 private fun NavGraphBuilder.smartSolar(navController: NavController) {
     composable(AppNavGraph.SMART_SOLAR) {
         SmartSolarScreen(
+            hiltViewModel<SmartSolarScreenViewModel>(),
             goBack = {
                 navController.popBackStack()
             }

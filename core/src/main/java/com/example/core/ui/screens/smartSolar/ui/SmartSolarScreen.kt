@@ -1,4 +1,4 @@
-package com.example.core.ui.screens.smartSolar
+package com.example.core.ui.screens.smartSolar.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -29,10 +29,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.R
+import com.example.core.ui.screens.smartSolar.usecase.SmartSolarScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SmartSolarScreen(goBack : () -> Unit) {
+fun SmartSolarScreen(smartSolarScreenViewModel: SmartSolarScreenViewModel,goBack : () -> Unit) {
     var tabIndex by remember { mutableIntStateOf(0) }
     val tabData = listOf("Mi instalación", "Energía", "Detalles")
     val pagerState = rememberPagerState { tabData.size }
@@ -101,7 +102,7 @@ fun SmartSolarScreen(goBack : () -> Unit) {
                 when (tabIndex) {
                     0 -> InstallationScreen()
                     1 -> EnergyScreen()
-                    2 -> DetailsScreen()
+                    2 -> DetailsScreenHost(smartSolarScreenViewModel)
                 }
             }
         }

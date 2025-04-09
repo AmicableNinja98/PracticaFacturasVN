@@ -1,17 +1,19 @@
 package com.example.practicafacturas.inject
 
 import android.content.Context
-import co.infinum.retromock.Retromock
 import com.example.data_retrofit.database.FacturaDao
 import com.example.data_retrofit.database.FacturaDatabase
-import com.example.data_retrofit.services.CustomKotlinSerializationConverter
+import com.example.data_retrofit.repository.SmartSolarLocalService
 import com.example.data_retrofit.services.FacturaApiService
-import com.example.data_retrofit.services.RetromockService
+import com.example.data_retrofit.services.SmartSolarService
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
@@ -23,9 +25,6 @@ import javax.inject.Singleton
 object AppModule {
     const val BASE_URL = "https://viewnextandroid.wiremockapi.cloud/"
     const val BASE_POSTMAN_URL = "https://adf8ae8e-69de-4fc2-b42b-fdb5ff4cbe3b.mock.pstmn.io/"
-    /*val json = Json {
-        ignoreUnknownKeys = true
-    }*/
 
     /**
      * Inyecta una instancia de retrofit para usar en la aplicación.
@@ -34,13 +33,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(): Retrofit = Retrofit.Builder()
         .baseUrl(BASE_POSTMAN_URL)
-        .addConverterFactory(CustomKotlinSerializationConverter())
-        .build()
-
-    @Provides
-    @Singleton
-    fun provideRetroMock(retrofit: Retrofit): Retromock = Retromock.Builder()
-        .retrofit(retrofit)
+        .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .build()
 
     /**
@@ -55,9 +48,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideRetromockService(retromock: Retromock): RetromockService = retromock.create(
-        RetromockService::class.java
-    )
+    fun provideSmartSolarService(@ApplicationContext context: Context): SmartSolarService = SmartSolarLocalService(context)
 
     /**
      * Inyecta la base de datos para usar en la aplicación.
