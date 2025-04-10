@@ -52,7 +52,7 @@ dependencies {
 
     implementation(project(":data-retrofit"))
     implementation(project(":domain"))
-    implementation(project(":ui"))
+    implementation(project(":base_ui"))
 
     // Retrofit
     implementation(libs.retrofit2.kotlinx.serialization.converter)
