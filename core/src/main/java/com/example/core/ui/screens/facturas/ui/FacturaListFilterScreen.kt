@@ -21,6 +21,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SliderColors
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -126,7 +127,7 @@ fun FacturaListFilter(
     ) {
         SeccionFechas(facturaListFilterViewModel)
         HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(vertical = 15.dp))
-        SeccionSlider(facturaListFilterViewModel)
+        SliderSection(facturaListFilterViewModel)
         HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(vertical = 15.dp))
         SeccionCheckBox(facturaListFilterViewModel)
         SeccionBotones(facturaListFilterViewModel, facturaSharedViewModel, goBack)
@@ -150,42 +151,14 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
         modifier = Modifier.padding(top = 15.dp, bottom = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(text = stringResource(R.string.filter_startDate_title))
-            BaseButton(
-                text = facturaListFilterViewModel.state.fechaInicio
-                    ?: stringResource(R.string.filter_date_button_text),
-                onClick = {
-                    openDialogFirstDate.value = true
-                },
-                colors = ButtonColors(
-                    containerColor = colorResource(R.color.light_gray),
-                    contentColor = Color.Black,
-                    disabledContainerColor = Color.LightGray,
-                    disabledContentColor = Color.LightGray
-                )
-            )
-        }
-        Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text(text = stringResource(R.string.filter_endDate_title))
-            BaseButton(
-                text = facturaListFilterViewModel.state.fechaFin
-                    ?: stringResource(R.string.filter_date_button_text),
-                onClick = {
-                    openDialogSecondDate.value = true
-                },
-                colors = ButtonColors(
-                    containerColor = colorResource(R.color.light_gray),
-                    contentColor = Color.Black,
-                    disabledContainerColor = Color.LightGray,
-                    disabledContentColor = Color.LightGray
-                )
-            )
-        }
+        DatePickerButton(title = stringResource(R.string.filter_startDate_title), buttonText = facturaListFilterViewModel.state.fechaInicio
+            ?: stringResource(R.string.filter_date_button_text), onClick = {
+            openDialogFirstDate.value = true
+        })
+        DatePickerButton(title = stringResource(R.string.filter_endDate_title), buttonText = facturaListFilterViewModel.state.fechaFin
+            ?: stringResource(R.string.filter_date_button_text), onClick = {
+            openDialogSecondDate.value = true
+        })
     }
     if (openDialogFirstDate.value) {
         FacturaDatePicker(
@@ -214,7 +187,26 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
 }
 
 @Composable
-fun SeccionSlider(facturaListFilterViewModel: FacturaListFilterViewModel) {
+fun DatePickerButton(title: String,buttonText : String,onClick: () -> Unit){
+    Column(
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Text(text = title)
+        BaseButton(
+            text = buttonText,
+            onClick = onClick,
+            colors = ButtonColors(
+                containerColor = colorResource(R.color.light_gray),
+                contentColor = Color.Black,
+                disabledContainerColor = Color.LightGray,
+                disabledContentColor = Color.LightGray
+            )
+        )
+    }
+}
+
+@Composable
+fun SliderSection(facturaListFilterViewModel: FacturaListFilterViewModel) {
     Text(
         text = stringResource(R.string.filter_importe_title),
         fontWeight = FontWeight.Bold,
@@ -344,11 +336,9 @@ fun ImporteSlider(
     modifier: Modifier = Modifier,
     steps: Int = 5
 ) {
-    val importeMinAbsoluto =
-        facturaListFilterViewModel.state.facturas.minOfOrNull { it.importeOrdenacion }
+    val importeMinAbsoluto = facturaListFilterViewModel.state.facturas.minOfOrNull { it.importeOrdenacion }
             ?.toFloat() ?: 0f
-    val importeMaxAbsoluto =
-        facturaListFilterViewModel.state.facturas.maxOfOrNull { it.importeOrdenacion }
+    val importeMaxAbsoluto = facturaListFilterViewModel.state.facturas.maxOfOrNull { it.importeOrdenacion }
             ?.toFloat() ?: 0f
     val sliderRange = importeMinAbsoluto..importeMaxAbsoluto
 
@@ -376,7 +366,7 @@ fun ImporteSlider(
             },
             valueRange = sliderRange,
             steps = steps,
-            colors = SliderDefaults.colors(
+            colors = SliderColors(
                 thumbColor = colorResource(id = R.color.dark_orange),
                 activeTrackColor = colorResource(id = R.color.dark_orange),
                 activeTickColor = colorResource(id = R.color.dark_orange),
@@ -391,7 +381,6 @@ fun ImporteSlider(
         )
     }
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
