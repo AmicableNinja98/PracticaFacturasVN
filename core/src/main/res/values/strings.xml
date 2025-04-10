@@ -26,4 +26,8 @@
     <string name="smartSolar_details_compensation_field_title">Compensación de excedentes</string>
     <string name="smartSolar_details_power_field_title">Potencia de instalación</string>
     <string name="facturaList_screen_appbar_title">Consumo</string>
+    <string name="smartSolar_details_loading_text">Cargando detalles del servicio...</string>
+    <string name="smartSolar_dialog_title">Estado solicitud autoconsumo</string>
+    <string name="smartSolar_dialog_message">El tiempo estimado de activación es de 1 a 2 meses, éste variará en función de tu comunidad autónoma y distribuidora</string>
+    <string name="smartSolar_dialog_button_text">Aceptar</string>
 </resources>

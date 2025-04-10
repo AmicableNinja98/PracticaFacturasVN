@@ -1,4 +1,4 @@
-package com.example.core.ui.screens.facturas.list.ui
+package com.example.core.ui.screens.facturas.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,8 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -33,19 +31,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import com.example.core.R
 import com.example.core.extensions.toFormattedDisplayDateOrNull
-import com.example.core.ui.screens.facturas.list.usecase.list.FacturaListState
-import com.example.core.ui.screens.facturas.list.usecase.list.FacturaListViewModel
-import com.example.core.ui.screens.facturas.list.usecase.FacturaSharedViewModel
+import com.example.core.ui.screens.facturas.usecase.FacturaSharedViewModel
+import com.example.core.ui.screens.facturas.usecase.list.FacturaListState
+import com.example.core.ui.screens.facturas.usecase.list.FacturaListViewModel
 import com.example.domain.factura.Factura
+import com.example.ui.base.composables.BaseAlertDialog
 import com.example.ui.base.composables.LoadingScreen
 import com.example.ui.base.composables.NoDataScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FacturaListScreenHost(facturaListViewModel: FacturaListViewModel,sharedViewModel: FacturaSharedViewModel ,goToFilter: () -> Unit,goBack: () -> Unit) {
+fun FacturaListScreenHost(
+    facturaListViewModel: FacturaListViewModel,
+    sharedViewModel: FacturaSharedViewModel,
+    goToFilter: () -> Unit,
+    goBack: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -73,7 +76,10 @@ fun FacturaListScreenHost(facturaListViewModel: FacturaListViewModel,sharedViewM
                             goToFilter()
                         }
                     ) {
-                        Icon(painter = painterResource(R.drawable.filtericon),contentDescription = null)
+                        Icon(
+                            painter = painterResource(R.drawable.filtericon),
+                            contentDescription = null
+                        )
                     }
                 }
             )
@@ -83,8 +89,16 @@ fun FacturaListScreenHost(facturaListViewModel: FacturaListViewModel,sharedViewM
             facturaListViewModel.getFacturasFromApiOrDatabase(sharedViewModel)
         }
         when (facturaListViewModel.state) {
-            is FacturaListState.Loading -> LoadingScreen(stringResource(R.string.loading_screen_title), modifier = Modifier.padding(innerPadding))
-            is FacturaListState.Success -> FacturaListScreen((facturaListViewModel.state as FacturaListState.Success).facturas, modifier = Modifier.padding(innerPadding))
+            is FacturaListState.Loading -> LoadingScreen(
+                stringResource(R.string.loading_screen_title),
+                modifier = Modifier.padding(innerPadding)
+            )
+
+            is FacturaListState.Success -> FacturaListScreen(
+                (facturaListViewModel.state as FacturaListState.Success).facturas,
+                modifier = Modifier.padding(innerPadding)
+            )
+
             is FacturaListState.NoData -> NoDataScreen(Modifier.padding(innerPadding))
         }
     }
@@ -153,7 +167,7 @@ fun FacturaItem(factura: Factura) {
         }
     }
     HorizontalDivider(thickness = 1.dp)
-    if(openDialog.value){
+    if (openDialog.value) {
         FacturaItemPopUp(
             title = stringResource(R.string.popUp_title),
             message = stringResource(R.string.popUp_message),
@@ -167,24 +181,10 @@ fun FacturaItem(factura: Factura) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FacturaItemPopUp(title: String, message: String, onDismiss: () -> Unit) {
-    AlertDialog(
-        title = {
-            Text(title)
-        },
-        onDismissRequest = {},
-        properties = DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false
-        ),
-        text = {
-            Text(message)
-        },
-        confirmButton = {
-            Button(
-                onClick = onDismiss
-            ) {
-                Text(stringResource(R.string.close_popUp))
-            }
-        }
+    BaseAlertDialog(
+        title = title,
+        message = message,
+        onDismiss = onDismiss,
+        closeButtonText = stringResource(R.string.close_popUp)
     )
 }

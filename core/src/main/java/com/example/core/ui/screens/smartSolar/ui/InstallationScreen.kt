@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -25,6 +27,7 @@ import com.example.core.R
 import com.example.core.ui.screens.smartSolar.usecase.SmartSolarScreenState
 import com.example.core.ui.screens.smartSolar.usecase.SmartSolarScreenViewModel
 import com.example.domain.use_details.UseDetails
+import com.example.ui.base.composables.BaseAlertDialog
 import com.example.ui.base.composables.BaseReadOnlyTextField
 import com.example.ui.base.composables.LoadingScreen
 import com.example.ui.base.composables.NoDataScreen
@@ -92,7 +95,7 @@ fun DetailsScreenHost(smartSolarScreenViewModel: SmartSolarScreenViewModel) {
         smartSolarScreenViewModel.loadMockDetails()
     }
     when(smartSolarScreenViewModel.state){
-        is SmartSolarScreenState.Loading -> LoadingScreen("Cargando detalles del servicio...")
+        is SmartSolarScreenState.Loading -> LoadingScreen(stringResource(R.string.smartSolar_details_loading_text))
         is SmartSolarScreenState.Success -> DetailsScreen((smartSolarScreenViewModel.state as SmartSolarScreenState.Success).details)
         is SmartSolarScreenState.NoData -> NoDataScreen()
     }
@@ -100,6 +103,7 @@ fun DetailsScreenHost(smartSolarScreenViewModel: SmartSolarScreenViewModel) {
 
 @Composable
 fun DetailsScreen(details: UseDetails){
+    val openDialog = remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -112,7 +116,11 @@ fun DetailsScreen(details: UseDetails){
         )
         BaseReadOnlyTextField(
             title = stringResource(R.string.smartSolar_details_request_status_title),
-            input = details.estado
+            input = details.estado,
+            iconRequired = true,
+            onIconClick = {
+                openDialog.value = true
+            }
         )
         BaseReadOnlyTextField(
             title = stringResource(R.string.smartSolar_details_type_title),
@@ -126,5 +134,15 @@ fun DetailsScreen(details: UseDetails){
             title = stringResource(R.string.smartSolar_details_power_field_title),
             input = details.potencia
         )
+        if(openDialog.value){
+            BaseAlertDialog(
+                title = stringResource(R.string.smartSolar_dialog_title),
+                message = stringResource(R.string.smartSolar_dialog_message),
+                closeButtonText = stringResource(R.string.smartSolar_dialog_button_text),
+                onDismiss = {
+                    openDialog.value = false
+                }
+            )
+        }
     }
 }

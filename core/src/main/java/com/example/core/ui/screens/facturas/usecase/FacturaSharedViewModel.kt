@@ -1,4 +1,4 @@
-package com.example.core.ui.screens.facturas.list.usecase
+package com.example.core.ui.screens.facturas.usecase
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

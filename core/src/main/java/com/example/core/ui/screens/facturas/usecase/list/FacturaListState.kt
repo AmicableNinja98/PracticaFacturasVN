@@ -1,4 +1,4 @@
-package com.example.core.ui.screens.facturas.list.usecase.list
+package com.example.core.ui.screens.facturas.usecase.list
 
 import com.example.domain.factura.Factura
 

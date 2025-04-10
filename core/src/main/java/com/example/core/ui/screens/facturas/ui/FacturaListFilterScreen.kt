@@ -1,4 +1,4 @@
-package com.example.core.ui.screens.facturas.list.ui
+package com.example.core.ui.screens.facturas.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,9 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Checkbox
@@ -41,10 +38,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import com.example.core.R
-import com.example.core.ui.screens.facturas.list.usecase.filter.FacturaListFilterViewModel
-import com.example.core.ui.screens.facturas.list.usecase.FacturaSharedViewModel
+import com.example.core.ui.screens.facturas.usecase.FacturaSharedViewModel
+import com.example.core.ui.screens.facturas.usecase.filter.FacturaListFilterViewModel
+import com.example.ui.base.composables.BaseAlertDialog
 import com.example.ui.base.composables.BaseButton
 
 @Composable
@@ -85,7 +82,14 @@ fun FacturaListFilterScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {},
+                title = {
+                    Text(
+                        text = stringResource(R.string.filter_screen_title),
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 40.sp,
+                        modifier = Modifier.padding(top = 20.dp)
+                    )
+                },
                 actions = {
                     IconButton(
                         onClick = goBack
@@ -119,19 +123,7 @@ fun FacturaListFilter(
     Column(
         modifier = modifier
             .padding(20.dp)
-            .verticalScroll(rememberScrollState())
     ) {
-        Text(
-            text = stringResource(R.string.filter_screen_title),
-            fontWeight = FontWeight.Bold,
-            fontSize = 40.sp,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-        Text(
-            text = stringResource(R.string.filter_date_title),
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
-        )
         SeccionFechas(facturaListFilterViewModel)
         HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(vertical = 15.dp))
         SeccionSlider(facturaListFilterViewModel)
@@ -149,6 +141,11 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
     val datePickerFirstDateState = rememberDatePickerState()
     val datePickerSecondDateState = rememberDatePickerState()
 
+    Text(
+        text = stringResource(R.string.filter_date_title),
+        fontWeight = FontWeight.Bold,
+        fontSize = 16.sp,
+    )
     Row(
         modifier = Modifier.padding(top = 15.dp, bottom = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
@@ -217,29 +214,6 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
 }
 
 @Composable
-fun SeccionCheckBox(facturaListFilterViewModel: FacturaListFilterViewModel) {
-    Text(
-        text = stringResource(R.string.filter_checkBox_title),
-        fontWeight = FontWeight.Bold,
-        fontSize = 16.sp,
-    )
-    facturaListFilterViewModel.state.estados.keys.forEach {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = facturaListFilterViewModel.state.estados.getValue(it),
-                onCheckedChange = { value ->
-                    facturaListFilterViewModel.onCheckedChange(it)
-                }
-            )
-            Text(it)
-        }
-    }
-}
-
-@Composable
 fun SeccionSlider(facturaListFilterViewModel: FacturaListFilterViewModel) {
     Text(
         text = stringResource(R.string.filter_importe_title),
@@ -249,7 +223,7 @@ fun SeccionSlider(facturaListFilterViewModel: FacturaListFilterViewModel) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(vertical = 10.dp, horizontal = 15.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
@@ -264,6 +238,33 @@ fun SeccionSlider(facturaListFilterViewModel: FacturaListFilterViewModel) {
     ImporteSlider(
         facturaListFilterViewModel = facturaListFilterViewModel
     )
+}
+
+@Composable
+fun SeccionCheckBox(facturaListFilterViewModel: FacturaListFilterViewModel) {
+    Box(
+        modifier = Modifier.padding(vertical = 10.dp, horizontal = 15.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.filter_checkBox_title),
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+        )
+    }
+    facturaListFilterViewModel.state.estados.keys.forEach {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(
+                checked = facturaListFilterViewModel.state.estados.getValue(it),
+                onCheckedChange = { value ->
+                    facturaListFilterViewModel.onCheckedChange(it)
+                }
+            )
+            Text(it)
+        }
+    }
 }
 
 @Composable
@@ -395,24 +396,10 @@ fun ImporteSlider(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NoDataFilterPopUp(title: String, message: String, onDismiss: () -> Unit) {
-    AlertDialog(
-        title = {
-            Text(title)
-        },
-        onDismissRequest = {},
-        properties = DialogProperties(
-            dismissOnBackPress = false,
-            dismissOnClickOutside = false
-        ),
-        text = {
-            Text(message)
-        },
-        confirmButton = {
-            Button(
-                onClick = onDismiss
-            ) {
-                Text(stringResource(R.string.filter_popUp_close_text))
-            }
-        }
+    BaseAlertDialog(
+        title = title,
+        message = message,
+        onDismiss = onDismiss,
+        closeButtonText = stringResource(R.string.filter_popUp_close_text)
     )
 }

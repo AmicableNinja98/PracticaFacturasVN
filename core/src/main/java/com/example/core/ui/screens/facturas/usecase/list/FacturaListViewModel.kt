@@ -1,11 +1,11 @@
-package com.example.core.ui.screens.facturas.list.usecase.list
+package com.example.core.ui.screens.facturas.usecase.list
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.core.ui.screens.facturas.list.usecase.FacturaSharedViewModel
+import com.example.core.ui.screens.facturas.usecase.FacturaSharedViewModel
 import com.example.data_retrofit.repository.FacturaRepository
 import com.example.domain.factura.Factura
 import dagger.hilt.android.lifecycle.HiltViewModel

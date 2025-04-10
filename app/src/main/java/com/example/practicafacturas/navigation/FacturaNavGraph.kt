@@ -6,11 +6,11 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
-import com.example.core.ui.screens.facturas.list.ui.FacturaListFilterHost
-import com.example.core.ui.screens.facturas.list.ui.FacturaListScreenHost
-import com.example.core.ui.screens.facturas.list.usecase.FacturaSharedViewModel
-import com.example.core.ui.screens.facturas.list.usecase.filter.FacturaListFilterViewModel
-import com.example.core.ui.screens.facturas.list.usecase.list.FacturaListViewModel
+import com.example.core.ui.screens.facturas.ui.FacturaListFilterHost
+import com.example.core.ui.screens.facturas.ui.FacturaListScreenHost
+import com.example.core.ui.screens.facturas.usecase.FacturaSharedViewModel
+import com.example.core.ui.screens.facturas.usecase.filter.FacturaListFilterViewModel
+import com.example.core.ui.screens.facturas.usecase.list.FacturaListViewModel
 
 fun NavGraphBuilder.facturaGraph(navController: NavController) {
     navigation(startDestination = AppNavGraph.FACTURA_LIST, route = AppNavGraph.FACTURA) {
