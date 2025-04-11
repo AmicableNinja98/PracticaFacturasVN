@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.R
 import com.example.core.extensions.toFormattedDisplayDateOrNull
-import com.example.core.ui.screens.facturas.usecase.FacturaSharedViewModel
+import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
 import com.example.core.ui.screens.facturas.usecase.list.FacturaListState
 import com.example.core.ui.screens.facturas.usecase.list.FacturaListViewModel
 import com.example.domain.factura.Factura
