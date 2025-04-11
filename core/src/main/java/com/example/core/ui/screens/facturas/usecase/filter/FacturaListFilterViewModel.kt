@@ -14,6 +14,7 @@ import com.example.domain.factura.Factura
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Locale
 import javax.inject.Inject
 
@@ -30,8 +31,8 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         viewModelScope.launch {
             facturaRepository.getFacturasFromDatabase().collect {
                 facturas ->
-                if(facturas.isNotEmpty()) {
-                    updateStateAfterInit(facturas.toMutableList(),sharedViewModel)
+                if (facturas.isNotEmpty()) {
+                    updateStateAfterInit(facturas.toMutableList(), sharedViewModel)
                     facturasOriginal = facturas.toMutableList()
                 }
             }
@@ -61,7 +62,7 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
             )
     }
 
-    fun onCheckedChange(index : Int) {
+    fun onCheckedChange(index: Int) {
         val estado = state.estados[index]
         state.estados[index] = estado.copy(seleccionado = !estado.seleccionado)
         state = if (state.estados.any {
@@ -70,7 +71,6 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
             state.copy(filtroEstadoAplicado = true)
         else
             state.copy(filtroEstadoAplicado = false)
-
     }
 
     fun onStartDateChanged(date: Long?) {
@@ -82,7 +82,7 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
 
     fun onEndDateChanged(date: Long?) {
         if (date != null) {
-            val dateFormat = SimpleDateFormat(format,Locale.getDefault())
+            val dateFormat = SimpleDateFormat(format, Locale.getDefault())
             state = state.copy(fechaFin = dateFormat.format(date), filtroFechaAplicado = true)
         }
     }
@@ -95,13 +95,11 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         )
     }
 
-    fun onFiltersReset(sharedViewModel: FacturaSharedViewModel) {
-        resetState(sharedViewModel)
-    }
+    fun onFiltersReset(sharedViewModel: FacturaSharedViewModel) = resetState(sharedViewModel)
 
-    private fun resetState(sharedViewModel: FacturaSharedViewModel){
-        state.estados.forEachIndexed {
-            index,estado -> state.estados[index] = estado.copy(seleccionado = false)
+    private fun resetState(sharedViewModel: FacturaSharedViewModel) {
+        state.estados.forEachIndexed { index, estado ->
+            state.estados[index] = estado.copy(seleccionado = false)
         }
         state = state.copy(
             fechaInicio = null,
@@ -116,30 +114,27 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         sharedViewModel.setFilters(false)
     }
 
-    fun onApplyFiltersClick(sharedViewModel: FacturaSharedViewModel) {
+    fun onApplyFiltersClick(sharedViewModel: FacturaSharedViewModel) =
         applyFiltersAndUpdateState(sharedViewModel)
-    }
 
-    private fun applyFiltersAndUpdateState(sharedViewModel: FacturaSharedViewModel){
+    private fun applyFiltersAndUpdateState(sharedViewModel: FacturaSharedViewModel) {
         val facturasFiltradas = applyFiltersToList()
-        if(facturasFiltradas.isNotEmpty()){
-            state = state.copy(facturas = facturasFiltradas, sinDatos = false)
+        if (facturasFiltradas.isNotEmpty()) {
+            state = state.copy(facturas = facturasFiltradas.toMutableList(), sinDatos = false)
             updateSharedViewModel(sharedViewModel)
-        }
-        else
+        } else
             state = state.copy(sinDatos = true)
     }
 
-    private fun applyFiltersToList(): MutableList<Factura> {
-        val startDate = if (state.fechaInicio != null) state.fechaInicio!!.replace(
+    private fun applyFiltersToList(): List<Factura> {
+        val startDate = state.fechaInicio?.replace(
             "/",
             "-"
-        ).toLocalDateOrNull() else "01-01-2000".toLocalDateOrNull()
-        val endDate = if (state.fechaFin != null) state.fechaFin!!.replace(
+        )?.toLocalDateOrNull() ?: LocalDate.MIN
+        val endDate = state.fechaFin?.replace(
             "/",
             "-"
-        ).toLocalDateOrNull() else /*LocalDate.parse(LocalDate.now().toString(), DateTimeFormatter.ofPattern(format))*/
-            "31-12-2025".toLocalDateOrNull()
+        )?.toLocalDateOrNull() ?: LocalDate.MAX
 
         val estadosSeleccionados = state.estados.filter {
             it.seleccionado
@@ -147,14 +142,25 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
 
         return facturasOriginal.filter { factura ->
             val facturaDate = factura.fecha.replace("/", "-").toLocalDateOrNull()
-            (if (state.filtroFechaAplicado) facturaDate!! >= startDate && facturaDate <= endDate
-            else true) &&
-                    (if (state.filtroImporteAplicado) factura.importeOrdenacion >= state.importeMin && factura.importeOrdenacion <= state.importeMax else true) &&
-                    (if (state.filtroEstadoAplicado) estadosSeleccionados.contains(factura.descEstado) else true)
-        }.toMutableList()
+
+            val fechaValida = if (state.filtroFechaAplicado && facturaDate != null) {
+                (startDate == null || !facturaDate.isBefore(startDate)) &&
+                        (endDate == null || !facturaDate.isAfter(endDate))
+            } else true
+
+            val importeValido = if (state.filtroImporteAplicado) {
+                factura.importeOrdenacion in state.importeMin..state.importeMax
+            } else true
+
+            val estadoValido = if (state.filtroEstadoAplicado) {
+                factura.descEstado in estadosSeleccionados
+            } else true
+
+            fechaValida && importeValido && estadoValido
+        }
     }
 
-    private fun updateSharedViewModel(sharedViewModel: FacturaSharedViewModel){
+    private fun updateSharedViewModel(sharedViewModel: FacturaSharedViewModel) {
         sharedViewModel.setFilters(true)
 
         sharedViewModel.setIds(state.facturas.map {
@@ -165,8 +171,8 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         sharedViewModel.setFechaMax(state.fechaFin)
         sharedViewModel.setImporteMin(state.importeMin)
         sharedViewModel.setImporteMax(state.importeMax)
-        state.estados.forEach {
-            estado -> sharedViewModel.setEstado(estado.nombre,estado.seleccionado)
+        state.estados.forEach { estado ->
+            sharedViewModel.setEstado(estado.nombre, estado.seleccionado)
         }
     }
 
