@@ -1,8 +1,6 @@
 package com.example.core.ui.screens.facturas.usecase.shared
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -11,59 +9,47 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FacturaSharedViewModel @Inject constructor() : ViewModel() {
-    private var idList by mutableStateOf<List<Int>>(emptyList())
-
-    private var filtersApplied by mutableStateOf(false)
-
-    private var filterImporteMin by mutableDoubleStateOf(0.0)
-
-    private var filterImporteMax by mutableDoubleStateOf(0.0)
-
-    private var filterEstados = mutableStateMapOf<String, Boolean>()
-
-    private var filterFechaMin by mutableStateOf<String?>("")
-
-    private var filterFechaMax by mutableStateOf<String?>("")
-
-    fun getIds() : List<Int> = idList
+    var state by mutableStateOf<FacturaSharedState>(FacturaSharedState())
+        private set
+    fun getIds() : List<Int> = state.idList
 
     fun setIds(ids : List<Int>){
-        idList = ids
+        state.idList = ids.toMutableList()
     }
 
-    fun getFilters() : Boolean = filtersApplied
+    fun getFilters() : Boolean = state.filtersApplied
 
     fun setFilters(value : Boolean){
-        filtersApplied = value
+        state.filtersApplied = value
     }
 
-    fun getImporteMin() : Double = filterImporteMin
+    fun getImporteMin() : Double = state.filterImporteMin
 
     fun setImporteMin(value : Double){
-        filterImporteMin = value
+        state.filterImporteMin = value
     }
 
-    fun getImporteMax() : Double = filterImporteMax
+    fun getImporteMax() : Double = state.filterImporteMax
 
     fun setImporteMax(value : Double){
-        filterImporteMax = value
+        state.filterImporteMax = value
     }
 
-    fun getFechaMin() : String? = filterFechaMin
+    fun getFechaMin() : String? = state.filterFechaMin
 
     fun setFechaMin(value : String?){
-        filterFechaMin = value
+        state.filterFechaMin = value
     }
 
-    fun getFechaMax() : String? = filterFechaMax
+    fun getFechaMax() : String? = state.filterFechaMax
 
     fun setFechaMax(value : String?){
-        filterFechaMax = value
+        state.filterFechaMax = value
     }
 
-    fun getEstados() : Map<String, Boolean> = filterEstados
+    fun getEstados() : Map<String, Boolean> = state.filterEstados
 
     fun setEstado(key : String,value: Boolean){
-        filterEstados[key] = value
+        state.filterEstados[key] = value
     }
 }

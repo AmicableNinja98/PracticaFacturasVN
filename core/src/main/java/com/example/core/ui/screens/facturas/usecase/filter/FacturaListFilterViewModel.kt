@@ -100,12 +100,10 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
     }
 
     private fun resetState(sharedViewModel: FacturaSharedViewModel){
-        val estados = state.estados
-        estados.forEachIndexed {
-            index,estado -> estados[index] = estado.copy(seleccionado = false)
+        state.estados.forEachIndexed {
+            index,estado -> state.estados[index] = estado.copy(seleccionado = false)
         }
         state = state.copy(
-            estados = estados,
             fechaInicio = null,
             fechaFin = null,
             importeMin = facturasOriginal.minOf { it.importeOrdenacion },
