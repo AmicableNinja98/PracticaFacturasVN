@@ -22,7 +22,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SliderColors
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
@@ -40,8 +39,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.R
-import com.example.core.ui.screens.facturas.usecase.FacturaSharedViewModel
 import com.example.core.ui.screens.facturas.usecase.filter.FacturaListFilterViewModel
+import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
 import com.example.ui.base.composables.BaseAlertDialog
 import com.example.ui.base.composables.BaseButton
 
@@ -53,7 +52,7 @@ fun FacturaListFilterHost(
 ) {
     val openDialog = remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        facturaListFilterViewModel.getFacturasFromRepository()
+        facturaListFilterViewModel.getFacturasFromRepository(facturaSharedViewModel)
     }
 
     if (facturaListFilterViewModel.state.sinDatos) {
@@ -243,18 +242,19 @@ fun SeccionCheckBox(facturaListFilterViewModel: FacturaListFilterViewModel) {
             fontSize = 16.sp,
         )
     }
-    facturaListFilterViewModel.state.estados.keys.forEach {
+    facturaListFilterViewModel.state.estados.forEachIndexed {
+        index, estadoFiltro ->
         Row(
             horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
-                checked = facturaListFilterViewModel.state.estados.getValue(it),
-                onCheckedChange = { value ->
-                    facturaListFilterViewModel.onCheckedChange(it)
+                checked = estadoFiltro.seleccionado,
+                onCheckedChange = {
+                    facturaListFilterViewModel.onCheckedChange(index)
                 }
             )
-            Text(it)
+            Text(estadoFiltro.nombre)
         }
     }
 }

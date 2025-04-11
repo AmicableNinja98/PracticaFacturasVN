@@ -1,7 +1,7 @@
 package com.example.core.ui.screens.facturas.usecase.filter
 
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.example.domain.factura.Factura
 
 data class FacturaListFilterState(
@@ -10,12 +10,12 @@ data class FacturaListFilterState(
     var importeMin : Double = 0.0,
     var importeMax : Double = 0.0,
     var facturas : MutableList<Factura> = mutableStateListOf(),
-    var estados : MutableMap<String, Boolean> = mutableStateMapOf<String, Boolean>(
-        "Pagada" to false,
-        "Anuladas" to false,
-        "Cuota fija" to false,
-        "Pendiente de pago" to false,
-        "Plan de pago" to false
+    var estados : SnapshotStateList<EstadoFiltro> = mutableStateListOf(
+        EstadoFiltro("Pagada", false),
+        EstadoFiltro("Anuladas", false),
+        EstadoFiltro("Cuota fija", false),
+        EstadoFiltro("Pendiente de pago", false),
+        EstadoFiltro("Plan de pago", false)
     ),
 
     var filtroFechaAplicado : Boolean = false,
@@ -23,4 +23,9 @@ data class FacturaListFilterState(
     var filtroEstadoAplicado : Boolean = false,
 
     var sinDatos : Boolean = false
+)
+
+data class EstadoFiltro(
+    val nombre: String,
+    val seleccionado: Boolean
 )

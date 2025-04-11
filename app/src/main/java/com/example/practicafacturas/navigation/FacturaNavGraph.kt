@@ -8,7 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.core.ui.screens.facturas.ui.FacturaListFilterHost
 import com.example.core.ui.screens.facturas.ui.FacturaListScreenHost
-import com.example.core.ui.screens.facturas.usecase.FacturaSharedViewModel
+import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
 import com.example.core.ui.screens.facturas.usecase.filter.FacturaListFilterViewModel
 import com.example.core.ui.screens.facturas.usecase.list.FacturaListViewModel
 
