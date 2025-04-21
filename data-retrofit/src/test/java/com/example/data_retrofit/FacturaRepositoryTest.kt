@@ -9,7 +9,7 @@ import com.example.domain.factura_response.FacturaResponse
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
@@ -35,8 +35,8 @@ class FacturaRepositoryTest {
     }
 
     @Test
-    fun `insertFactura calls DAO with mapped Factura`(){
-        runBlocking {
+    fun `insertFactura calls DAO with mapped Factura`() =
+        runTest {
             val facturaApi = FacturaApi("Emitida", 99.9, "2024-04-01")
 
             repository.insertFactura(facturaApi)
@@ -49,23 +49,27 @@ class FacturaRepositoryTest {
                 }
             )
         }
-    }
 
     @Test
-    fun `getFacturaById calls DAO and returns result`(){
-        runBlocking {
-            val factura = Factura(id = 1, descEstado = "Pagada", importeOrdenacion = 12.0, fecha = "2024-02-02")
+    fun `getFacturaById calls DAO and returns result`() =
+        runTest {
+            val factura = Factura(
+                id = 1,
+                descEstado = "Pagada",
+                importeOrdenacion = 12.0,
+                fecha = "2024-02-02"
+            )
             whenever(facturaDao.getFacturaById(1)).thenReturn(factura)
 
             val result = repository.getFacturaById(1)
 
             assertEquals(factura, result)
         }
-    }
+
 
     @Test
-    fun `getDataFromApiAndInsertToDatabase saves data when response is successful`() {
-        runBlocking {
+    fun `getDataFromApiAndInsertToDatabase saves data when response is successful`() =
+        runTest {
             val facturasApi = listOf(
                 FacturaApi("Emitida", 100.0, "2024-01-01"),
                 FacturaApi("Pagada", 200.0, "2024-02-02")
@@ -78,11 +82,10 @@ class FacturaRepositoryTest {
 
             verify(facturaDao, times(2)).insertFactura(any())
         }
-    }
 
     @Test
-    fun `getFacturasFromDatabase returns flow from DAO`() {
-        runBlocking {
+    fun `getFacturasFromDatabase returns flow from DAO`() =
+        runTest {
             val list = listOf(
                 Factura(
                     id = 1,
@@ -98,11 +101,10 @@ class FacturaRepositoryTest {
 
             assertEquals(list, result)
         }
-    }
 
     @Test
-    fun `getDataFromApiAndInsertToDatabase does nothing when response is not successful`() {
-        runBlocking {
+    fun `getDataFromApiAndInsertToDatabase does nothing when response is not successful`() =
+        runTest {
             whenever(facturaApiService.getFacturas()).thenReturn(
                 Response.error(
                     500,
@@ -114,5 +116,40 @@ class FacturaRepositoryTest {
 
             verify(facturaDao, never()).insertFactura(any())
         }
-    }
+
+    @Test
+    fun `getDataFromApiAndInsertToDatabase does nothing when body is null`() =
+        runTest {
+            whenever(facturaApiService.getFacturas()).thenReturn(
+                Response.success(null)
+            )
+
+            repository.getDataFromApiAndInsertToDatabase()
+
+            verify(facturaDao, never()).insertFactura(any())
+        }
+
+    @Test
+    fun `getDataFromApiAndInsertToDatabase does nothing when numFacturas = 0`() =
+        runTest {
+            whenever(facturaApiService.getFacturas()).thenReturn(
+                Response.success(FacturaResponse(facturas = listOf(), numFacturas = 0))
+            )
+
+            repository.getDataFromApiAndInsertToDatabase()
+
+            verify(facturaDao,never()).insertFactura(any())
+        }
+
+    @Test
+    fun `getDataFromApiAndInsertToDatabase does nothing when facturas is empty`() =
+        runTest {
+            whenever(facturaApiService.getFacturas()).thenReturn(
+                Response.success(FacturaResponse(facturas = listOf(), numFacturas = 2))
+            )
+
+            repository.getDataFromApiAndInsertToDatabase()
+
+            verify(facturaDao,never()).insertFactura(any())
+        }
 }

@@ -73,17 +73,13 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
             state.copy(filtroEstadoAplicado = false)
     }
 
-    fun onStartDateChanged(date: Long?) {
+    fun onDateChanged(date: Long?,isStartDate : Boolean = false) {
         if (date != null) {
             val dateFormat = SimpleDateFormat(format, Locale.getDefault())
-            state = state.copy(fechaInicio = dateFormat.format(date), filtroFechaAplicado = true)
-        }
-    }
-
-    fun onEndDateChanged(date: Long?) {
-        if (date != null) {
-            val dateFormat = SimpleDateFormat(format, Locale.getDefault())
-            state = state.copy(fechaFin = dateFormat.format(date), filtroFechaAplicado = true)
+            state = if(isStartDate){
+                state.copy(fechaInicio = dateFormat.format(date), filtroFechaAplicado = true)
+            } else
+                state.copy(fechaFin = dateFormat.format(date), filtroFechaAplicado = true)
         }
     }
 
