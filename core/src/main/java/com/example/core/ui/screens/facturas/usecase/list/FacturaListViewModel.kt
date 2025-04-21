@@ -1,5 +1,6 @@
 package com.example.core.ui.screens.facturas.usecase.list
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,7 +8,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
 import com.example.data_retrofit.repository.FacturaRepository
-import com.example.domain.factura.Factura
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,9 +28,8 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
     }
 
     private suspend fun getFilteredFacturas(sharedViewModel: FacturaSharedViewModel) {
-        val facturas = mutableListOf<Factura>()
-        sharedViewModel.getIds().forEach { id ->
-            facturas.add(facturaRepository.getFacturaById(id)!!)
+        val facturas = sharedViewModel.getIds().mapNotNull { id ->
+            facturaRepository.getFacturaById(id)
         }
         state = if (facturas.isNotEmpty())
             FacturaListState.Success(facturas)
@@ -58,5 +57,10 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
             sharedViewModel.setIds((state as FacturaListState.Success).facturas.map {
                 it.id
             }.toMutableList())
+    }
+
+    @VisibleForTesting
+    fun setTestState(newState: FacturaListState) {
+        state = newState
     }
 }
