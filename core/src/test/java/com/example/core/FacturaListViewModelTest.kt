@@ -5,7 +5,6 @@ import com.example.core.ui.screens.facturas.usecase.list.FacturaListViewModel
 import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
 import com.example.data_retrofit.repository.FacturaRepository
 import com.example.domain.factura.Factura
-import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -13,14 +12,10 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import org.junit.After
-import org.junit.Before
-import org.junit.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.mockito.kotlin.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FacturaListViewModelTest {
@@ -29,7 +24,7 @@ class FacturaListViewModelTest {
     private lateinit var viewModel: FacturaListViewModel
     private val testDispatcher = StandardTestDispatcher()
 
-    @Before
+    @BeforeEach
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         repository = mock()
@@ -49,7 +44,7 @@ class FacturaListViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         assert(viewModel.state is FacturaListState.Success)
-        assertEquals(listOf(factura), (viewModel.state as FacturaListState.Success).facturas)
+        assert((viewModel.state as FacturaListState.Success).facturas == listOf(factura))
     }
 
     @Test
@@ -76,7 +71,7 @@ class FacturaListViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         assert(viewModel.state is FacturaListState.Success)
-        assertEquals(facturaList, (viewModel.state as FacturaListState.Success).facturas)
+        assert((viewModel.state as FacturaListState.Success).facturas == facturaList)
     }
 
     @Test
@@ -95,7 +90,7 @@ class FacturaListViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         assert(viewModel.state is FacturaListState.Success)
-        assertEquals(facturaList, (viewModel.state as FacturaListState.Success).facturas)
+        assert((viewModel.state as FacturaListState.Success).facturas == facturaList)
     }
 
     @Test
@@ -136,8 +131,8 @@ class FacturaListViewModelTest {
         verify(sharedViewModel, never()).setIds(any())
     }
 
-    @After
-    fun tearDown(){
+    @AfterEach
+    fun tearDown() {
         Dispatchers.resetMain()
     }
 }

@@ -165,7 +165,7 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
                 openDialogFirstDate.value = false
             },
             onClick = {
-                facturaListFilterViewModel.onStartDateChanged(datePickerFirstDateState.selectedDateMillis)
+                facturaListFilterViewModel.onDateChanged(datePickerFirstDateState.selectedDateMillis,isStartDate = true)
                 openDialogFirstDate.value = false
             },
             datePickerState = datePickerFirstDateState
@@ -177,7 +177,7 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
                 openDialogSecondDate.value = false
             },
             onClick = {
-                facturaListFilterViewModel.onEndDateChanged(datePickerSecondDateState.selectedDateMillis)
+                facturaListFilterViewModel.onDateChanged(datePickerSecondDateState.selectedDateMillis)
                 openDialogSecondDate.value = false
             },
             datePickerState = datePickerSecondDateState
