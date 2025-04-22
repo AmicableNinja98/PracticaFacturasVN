@@ -1,5 +1,6 @@
 package com.example.data_retrofit
 
+import android.content.Context
 import com.example.data_retrofit.database.FacturaDao
 import com.example.data_retrofit.repository.FacturaRepository
 import com.example.data_retrofit.services.FacturaApiService
@@ -25,13 +26,15 @@ import retrofit2.Response
 class FacturaRepositoryTest {
     private lateinit var facturaDao: FacturaDao
     private lateinit var facturaApiService: FacturaApiService
+    private lateinit var context: Context
     private lateinit var repository: FacturaRepository
 
     @Before
     fun setup() {
         facturaDao = mock()
         facturaApiService = mock()
-        repository = FacturaRepository(facturaApiService, facturaDao)
+        context = mock()
+        repository = FacturaRepository(facturaApiService, facturaDao,context)
     }
 
     @Test

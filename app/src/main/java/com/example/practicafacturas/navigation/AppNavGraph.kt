@@ -7,13 +7,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.core.ui.screens.smartSolar.ui.SmartSolarScreen
 import com.example.core.ui.screens.smartSolar.usecase.SmartSolarScreenViewModel
-import com.example.practicafacturas.home.HomeScreen
+import com.example.practicafacturas.home.ui.HomeScreen
+import com.example.practicafacturas.home.usecase.HomeScreenViewModel
 
 object AppNavGraph {
     const val ROOT = "root"
     const val HOME = "home"
     const val FACTURA = "factura"
-    const val FACTURA_LIST = "$FACTURA/list"
+    const val FACTURA_LIST = "$FACTURA/list?useJson={useJson}"
     const val FACTURA_FILTER = "$FACTURA/filter"
     const val SMART_SOLAR = "smart_solar"
 }
@@ -31,8 +32,10 @@ private fun NavGraphBuilder.home(navController: NavController) {
         AppNavGraph.HOME
     ) {
         HomeScreen(
+            homeScreenViewModel = hiltViewModel<HomeScreenViewModel>(),
             {
-                navController.navigate(AppNavGraph.FACTURA)
+                useJson ->
+                navController.navigate("${AppNavGraph.FACTURA}/list?useJson=$useJson")
             },
             {
                 navController.navigate(AppNavGraph.SMART_SOLAR)

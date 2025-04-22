@@ -27,7 +27,11 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
 
     private var format = "dd/MM/yyyy"
 
-    fun getFacturasFromRepository(sharedViewModel: FacturaSharedViewModel) {
+    fun getFacturas(sharedViewModel: FacturaSharedViewModel){
+        getFacturasFromRepository(sharedViewModel)
+    }
+
+    private fun getFacturasFromRepository(sharedViewModel: FacturaSharedViewModel) {
         viewModelScope.launch {
             facturaRepository.getFacturasFromDatabase().collect {
                 facturas ->

@@ -12,7 +12,7 @@ data class FacturaListFilterState(
     var facturas : MutableList<Factura> = mutableStateListOf(),
     var estados : SnapshotStateList<EstadoFiltro> = mutableStateListOf(
         EstadoFiltro("Pagada", false),
-        EstadoFiltro("Anuladas", false),
+        EstadoFiltro("Anulada", false),
         EstadoFiltro("Cuota fija", false),
         EstadoFiltro("Pendiente de pago", false),
         EstadoFiltro("Plan de pago", false)
