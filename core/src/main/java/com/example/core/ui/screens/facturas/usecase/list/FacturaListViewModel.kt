@@ -29,7 +29,7 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
         }
     }
 
-    fun getFacturasFromApiOrDatabase(sharedViewModel: FacturaSharedViewModel, useJson: Boolean) {
+    fun getFacturasFromApiOrDatabase(sharedViewModel: FacturaSharedViewModel, useJson: Boolean = false) {
         viewModelScope.launch {
             state = FacturaListState.Loading
             if (sharedViewModel.getFilters())

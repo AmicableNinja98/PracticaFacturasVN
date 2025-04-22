@@ -22,7 +22,7 @@ class FacturaRepository @Inject constructor(
 
     private suspend fun getFacturasFromMock() = mockFacturaApiService.getMockFacturas()
 
-    suspend fun getDataFromApiAndInsertToDatabase(useMock : Boolean) {
+    suspend fun getDataFromApiAndInsertToDatabase(useMock : Boolean = false) {
         var response = if(useMock) getFacturasFromMock() else getFacturasFromApi()
         if (response.isSuccessful) {
             val body = response.body()

@@ -88,7 +88,6 @@ fun FacturaListScreenHost(
     ) { innerPadding ->
         LaunchedEffect(Unit) {
             facturaListViewModel.getFacturasFromApiOrDatabase(sharedViewModel,useMock)
-            sharedViewModel.setIsMockUsed(useMock)
         }
         when (facturaListViewModel.state) {
             is FacturaListState.Loading -> LoadingScreen(
