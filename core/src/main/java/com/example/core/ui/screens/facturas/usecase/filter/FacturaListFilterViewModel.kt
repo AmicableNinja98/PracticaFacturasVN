@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.math.ceil
 
 @HiltViewModel
 class FacturaListFilterViewModel @Inject constructor(val facturaRepository: FacturaRepository) : ViewModel() {
@@ -149,7 +150,7 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
             } else true
 
             val importeValido = if (state.filtroImporteAplicado) {
-                factura.importeOrdenacion in state.importeMin..state.importeMax
+                factura.importeOrdenacion in state.importeMin..ceil(state.importeMax)
             } else true
 
             val estadoValido = if (state.filtroEstadoAplicado) {
