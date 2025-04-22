@@ -5,8 +5,6 @@ import androidx.compose.runtime.mutableStateMapOf
 data class FacturaSharedState(
     var idList: MutableList<Int> = mutableListOf(),
 
-    var jsonUsed : Boolean = false,
-
     var filtersApplied: Boolean = false,
 
     var filterImporteMin: Double = 0.0,
