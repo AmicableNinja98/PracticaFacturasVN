@@ -39,7 +39,7 @@ class FacturaListFilterViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `getFacturasFromRepository sets initial state without filters`() = runTest {
+    fun `getFacturas sets initial state without filters`() = runTest {
         val facturas = listOf(
             Factura(1, "Pagada", 100.0, "01/01/2024"),
             Factura(2, "Pagada", 300.0, "01/02/2024")
@@ -48,7 +48,7 @@ class FacturaListFilterViewModelTest {
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
         whenever(sharedViewModel.getFilters()).thenReturn(false)
 
-        viewModel.getFacturasFromRepository(sharedViewModel)
+        viewModel.getFacturas(sharedViewModel)
         advanceUntilIdle()
 
         with(viewModel.state) {
@@ -108,7 +108,7 @@ class FacturaListFilterViewModelTest {
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
         whenever(sharedViewModel.getFilters()).thenReturn(false)
 
-        viewModel.getFacturasFromRepository(sharedViewModel)
+        viewModel.getFacturas(sharedViewModel)
         advanceUntilIdle()
 
         viewModel.onSliderValueChange(90f..150f)
@@ -130,7 +130,7 @@ class FacturaListFilterViewModelTest {
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
         whenever(sharedViewModel.getFilters()).thenReturn(false)
 
-        viewModel.getFacturasFromRepository(sharedViewModel)
+        viewModel.getFacturas(sharedViewModel)
         advanceUntilIdle()
 
         viewModel.onSliderValueChange(200f..300f)
@@ -150,7 +150,7 @@ class FacturaListFilterViewModelTest {
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
         whenever(sharedViewModel.getFilters()).thenReturn(false)
 
-        viewModel.getFacturasFromRepository(sharedViewModel)
+        viewModel.getFacturas(sharedViewModel)
         advanceUntilIdle()
 
         viewModel.onSliderValueChange(100f..300f)

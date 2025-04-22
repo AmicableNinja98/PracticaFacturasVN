@@ -45,6 +45,7 @@ import com.example.ui.base.composables.NoDataScreen
 @Composable
 fun FacturaListScreenHost(
     facturaListViewModel: FacturaListViewModel,
+    useMock : Boolean,
     sharedViewModel: FacturaSharedViewModel,
     goToFilter: () -> Unit,
     goBack: () -> Unit
@@ -86,7 +87,8 @@ fun FacturaListScreenHost(
         }
     ) { innerPadding ->
         LaunchedEffect(Unit) {
-            facturaListViewModel.getFacturasFromApiOrDatabase(sharedViewModel)
+            facturaListViewModel.getFacturasFromApiOrDatabase(sharedViewModel,useMock)
+            sharedViewModel.setIsMockUsed(useMock)
         }
         when (facturaListViewModel.state) {
             is FacturaListState.Loading -> LoadingScreen(
@@ -160,7 +162,7 @@ fun FacturaItem(factura: Factura) {
             modifier = Modifier.align(Alignment.CenterVertically)
         ) {
             Text(
-                "${factura.importeOrdenacion} €",
+                "${"%.2f".format(factura.importeOrdenacion)} €",
                 fontSize = 20.sp,
                 modifier = Modifier.padding(end = 16.dp)
             )

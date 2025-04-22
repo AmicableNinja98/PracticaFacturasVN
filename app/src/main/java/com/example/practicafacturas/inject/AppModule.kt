@@ -1,10 +1,13 @@
 package com.example.practicafacturas.inject
 
 import android.content.Context
+import co.infinum.retromock.Retromock
 import com.example.data_retrofit.database.FacturaDao
 import com.example.data_retrofit.database.FacturaDatabase
 import com.example.data_retrofit.repository.SmartSolarLocalService
 import com.example.data_retrofit.services.FacturaApiService
+import com.example.data_retrofit.services.MockApi
+import com.example.data_retrofit.services.RealApi
 import com.example.data_retrofit.services.SmartSolarService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -27,14 +30,25 @@ object AppModule {
     const val BASE_POSTMAN_URL = "https://adf8ae8e-69de-4fc2-b42b-fdb5ff4cbe3b.mock.pstmn.io/"
 
     /**
-     * Inyecta una instancia de retrofit para usar en la aplicación.
+     * Inyecta una instancia de retrofit con Postman para usar en la aplicación.
      */
     @Provides
     @Singleton
-    fun provideRetrofit(): Retrofit = Retrofit.Builder()
+    @RealApi
+    fun provideRealRetrofit(): Retrofit = Retrofit.Builder()
         .baseUrl(BASE_POSTMAN_URL)
         .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
         .build()
+
+    @Provides
+    @Singleton
+    @MockApi
+    fun provideRetromock(@RealApi retrofit: Retrofit,@ApplicationContext context: Context): Retromock {
+        return Retromock.Builder()
+            .defaultBodyFactory(context.assets::open)
+            .retrofit(retrofit)
+            .build()
+    }
 
     /**
      * Prepara a retrofit para conectarse a la api.
@@ -42,9 +56,16 @@ object AppModule {
      */
     @Provides
     @Singleton
-    fun provideApiService(retrofit: Retrofit): FacturaApiService = retrofit.create(
+    @RealApi
+    fun provideApiService(@RealApi retrofit: Retrofit): FacturaApiService = retrofit.create(
         FacturaApiService::class.java
     )
+
+    @Provides
+    @Singleton
+    @MockApi
+    fun provideMockApiService(@MockApi retromock: Retromock) : FacturaApiService = retromock.create(
+        FacturaApiService::class.java)
 
     @Provides
     @Singleton

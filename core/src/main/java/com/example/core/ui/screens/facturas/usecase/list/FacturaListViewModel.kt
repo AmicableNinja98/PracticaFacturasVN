@@ -13,17 +13,29 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FacturaListViewModel @Inject constructor(private val facturaRepository: FacturaRepository) : ViewModel() {
+class FacturaListViewModel @Inject constructor(private val facturaRepository: FacturaRepository) :
+    ViewModel() {
     var state by mutableStateOf<FacturaListState>(FacturaListState.Loading)
         private set
 
-    fun getFacturasFromApiOrDatabase(sharedViewModel: FacturaSharedViewModel) {
+    init {
+        resetData()
+    }
+
+    private fun resetData(){
+        viewModelScope.launch {
+            facturaRepository.deleteAll()
+            facturaRepository.resetIndexes()
+        }
+    }
+
+    fun getFacturasFromApiOrDatabase(sharedViewModel: FacturaSharedViewModel, useJson: Boolean) {
         viewModelScope.launch {
             state = FacturaListState.Loading
             if (sharedViewModel.getFilters())
                 getFilteredFacturas(sharedViewModel)
             else
-                getAllFacturas()
+                getAllFacturas(useJson)
         }
     }
 
@@ -37,10 +49,10 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
             FacturaListState.NoData
     }
 
-    private suspend fun getAllFacturas() {
+    private suspend fun getAllFacturas(useMock: Boolean) {
         facturaRepository.getFacturasFromDatabase().collect { facturas ->
             if (facturas.isEmpty()) {
-                facturaRepository.getDataFromApiAndInsertToDatabase()
+                facturaRepository.getDataFromApiAndInsertToDatabase(useMock)
                 facturaRepository.getFacturasFromDatabase().collect { facturas ->
                     state = if (facturas.isEmpty())
                         FacturaListState.NoData

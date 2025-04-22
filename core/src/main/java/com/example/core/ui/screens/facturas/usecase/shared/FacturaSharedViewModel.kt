@@ -17,6 +17,12 @@ class FacturaSharedViewModel @Inject constructor() : ViewModel() {
         state.idList = ids.toMutableList()
     }
 
+    fun getIsJsonUsed() = state.jsonUsed
+
+    fun setIsMockUsed(value: Boolean){
+        state.jsonUsed = value
+    }
+
     fun getFilters() : Boolean = state.filtersApplied
 
     fun setFilters(value : Boolean){

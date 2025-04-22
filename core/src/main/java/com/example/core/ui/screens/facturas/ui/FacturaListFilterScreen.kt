@@ -52,7 +52,7 @@ fun FacturaListFilterHost(
 ) {
     val openDialog = remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
-        facturaListFilterViewModel.getFacturasFromRepository(facturaSharedViewModel)
+        facturaListFilterViewModel.getFacturas(facturaSharedViewModel)
     }
 
     if (facturaListFilterViewModel.state.sinDatos) {

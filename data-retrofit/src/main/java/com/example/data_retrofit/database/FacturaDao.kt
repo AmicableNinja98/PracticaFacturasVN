@@ -20,4 +20,10 @@ interface FacturaDao {
 
     @Query("SELECT MAX(id) FROM Factura")
     suspend fun getLastFacturaId() : Int
+
+    @Query("DELETE FROM Factura")
+    suspend fun deleteAll()
+
+    @Query("DELETE FROM sqlite_sequence WHERE name = 'factura'")
+    suspend fun deletePrimaryKeyIndex()
 }
