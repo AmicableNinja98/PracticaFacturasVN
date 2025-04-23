@@ -19,10 +19,10 @@ class SmartSolarScreenViewModel @Inject constructor(private val smartSolarLocalS
         viewModelScope.launch {
             state = SmartSolarScreenState.Loading
             val details = smartSolarLocalService.getUseDetails()
-            if(details != null)
-                state = SmartSolarScreenState.Success(details)
+            state = if(details != null)
+                SmartSolarScreenState.Success(details)
             else
-                state = SmartSolarScreenState.NoData
+                SmartSolarScreenState.NoData
         }
     }
 }
