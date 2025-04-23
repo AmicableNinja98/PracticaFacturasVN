@@ -28,24 +28,23 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
 
     private var format = "dd/MM/yyyy"
 
-    fun getFacturas(sharedViewModel: FacturaSharedViewModel){
-        getFacturasFromRepository(sharedViewModel)
-    }
+    fun getFacturas(sharedViewModel: FacturaSharedViewModel) = getFacturasFromRepository(sharedViewModel)
 
-    private fun getFacturasFromRepository(sharedViewModel: FacturaSharedViewModel) {
+    private fun getFacturasFromRepository(sharedViewModel: FacturaSharedViewModel) =
         viewModelScope.launch {
-            facturaRepository.getFacturasFromDatabase().collect {
-                facturas ->
+            facturaRepository.getFacturasFromDatabase().collect { facturas ->
                 if (facturas.isNotEmpty()) {
                     updateStateAfterInit(facturas.toMutableList(), sharedViewModel)
                     facturasOriginal = facturas.toMutableList()
                 }
             }
         }
-    }
 
-    private fun updateStateAfterInit(facturas : MutableList<Factura>,sharedViewModel: FacturaSharedViewModel){
-        state = if(sharedViewModel.getFilters()){
+    private fun updateStateAfterInit(
+        facturas: MutableList<Factura>,
+        sharedViewModel: FacturaSharedViewModel
+    ) {
+        state = if (sharedViewModel.getFilters()) {
             state.copy(
                 facturas = facturas,
                 importeMin = sharedViewModel.getImporteMin(),
@@ -54,7 +53,7 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
                 fechaFin = sharedViewModel.getFechaMax(),
                 estados = mapToEstadoFiltroList(sharedViewModel.getEstados()),
                 filtroFechaAplicado = sharedViewModel.getFechaMin() != null || sharedViewModel.getFechaMax() != null,
-                filtroImporteAplicado = sharedViewModel.getImporteMin() != facturas.minOf { it.importeOrdenacion } || sharedViewModel.getImporteMax() != facturas.maxOf { it.importeOrdenacion },
+                filtroImporteAplicado = sharedViewModel.getImporteMin() != getImporteMinFromFacturas(facturas) || sharedViewModel.getImporteMax() != getImporteMaxFromFacturas(facturas),
                 filtroEstadoAplicado = sharedViewModel.getEstados().any {
                     it.value == true
                 }
@@ -62,8 +61,8 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         } else
             state.copy(
                 facturas = facturas,
-                importeMin = facturas.minOf { it.importeOrdenacion },
-                importeMax = facturas.maxOf { it.importeOrdenacion }
+                importeMin = getImporteMinFromFacturas(facturas),
+                importeMax = getImporteMaxFromFacturas(facturas)
             )
     }
 
@@ -78,13 +77,14 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
             state.copy(filtroEstadoAplicado = false)
     }
 
-    fun onDateChanged(date: Long?,isStartDate : Boolean = false) {
+    fun onDateChanged(date: Long?, isStartDate: Boolean = false) {
         if (date != null) {
             val dateFormat = SimpleDateFormat(format, Locale.getDefault())
-            state = if(isStartDate){
-                state.copy(fechaInicio = dateFormat.format(date), filtroFechaAplicado = true)
-            } else
-                state.copy(fechaFin = dateFormat.format(date), filtroFechaAplicado = true)
+            state =
+                if (isStartDate)
+                    state.copy(fechaInicio = dateFormat.format(date), filtroFechaAplicado = true)
+                else
+                    state.copy(fechaFin = dateFormat.format(date), filtroFechaAplicado = true)
         }
     }
 
@@ -105,8 +105,8 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         state = state.copy(
             fechaInicio = null,
             fechaFin = null,
-            importeMin = facturasOriginal.minOf { it.importeOrdenacion },
-            importeMax = facturasOriginal.maxOf { it.importeOrdenacion },
+            importeMin = getImporteMinFromFacturas(facturasOriginal),
+            importeMax = getImporteMaxFromFacturas(facturasOriginal),
             filtroImporteAplicado = false,
             filtroFechaAplicado = false,
             filtroEstadoAplicado = false,
@@ -115,8 +115,7 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         sharedViewModel.setFilters(false)
     }
 
-    fun onApplyFiltersClick(sharedViewModel: FacturaSharedViewModel) =
-        applyFiltersAndUpdateState(sharedViewModel)
+    fun onApplyFiltersClick(sharedViewModel: FacturaSharedViewModel) = applyFiltersAndUpdateState(sharedViewModel)
 
     private fun applyFiltersAndUpdateState(sharedViewModel: FacturaSharedViewModel) {
         val facturasFiltradas = applyFiltersToList()
@@ -184,4 +183,8 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         }
         return lista
     }
+
+    private fun getImporteMinFromFacturas(facturas : List<Factura>) = facturas.minOf { it.importeOrdenacion }
+
+    private fun getImporteMaxFromFacturas(facturas : List<Factura>) = facturas.maxOf { it.importeOrdenacion }
 }
