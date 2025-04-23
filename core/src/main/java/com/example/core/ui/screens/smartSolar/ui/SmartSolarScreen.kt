@@ -25,11 +25,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.R
 import com.example.core.ui.screens.smartSolar.usecase.SmartSolarScreenViewModel
+import com.example.ui.base.composables.appbar.BaseTopAppBarState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -107,4 +109,14 @@ fun SmartSolarScreen(smartSolarScreenViewModel: SmartSolarScreenViewModel,goBack
             }
         }
     }
+}
+
+@Composable
+fun getBaseTopAppBarState(goBack: () -> Unit) : BaseTopAppBarState{
+    return BaseTopAppBarState(
+        title = stringResource(R.string.smartSolar_appbar_title),
+        icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+        goBackAction = goBack,
+        actions = listOf()
+    )
 }
