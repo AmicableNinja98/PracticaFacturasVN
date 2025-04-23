@@ -29,7 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.practicafacturas.R
 import com.example.practicafacturas.home.usecase.HomeScreenViewModel
 
 @Composable
@@ -45,7 +47,7 @@ fun HomeScreen(
             .padding(16.dp),
     ) {
         Text(
-            text = "Bienvenido",
+            text = stringResource(R.string.homeScreen_title),
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.padding(top = 12.dp,bottom = 24.dp)
         )
@@ -66,7 +68,7 @@ fun HomeScreen(
         ) {
             item {
                 HomeCard(
-                    title = "Facturas",
+                    title = stringResource(R.string.homeScreen_facturasCard_title),
                     icon = Icons.AutoMirrored.Filled.List,
                     onClick = {
                         onNavigateToFacturas(homeScreenViewModel.useMockData)
@@ -75,7 +77,7 @@ fun HomeScreen(
             }
             item {
                 HomeCard(
-                    title = "Smart Solar",
+                    title = stringResource(R.string.homeScreen_smartSolarCard_title),
                     icon = Icons.Filled.Star,
                     onClick = onNavigateToSmartSolar
                 )

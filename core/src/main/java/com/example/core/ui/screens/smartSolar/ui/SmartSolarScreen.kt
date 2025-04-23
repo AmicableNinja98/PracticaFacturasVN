@@ -9,14 +9,10 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -24,13 +20,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.R
 import com.example.core.ui.screens.smartSolar.usecase.SmartSolarScreenViewModel
+import com.example.ui.base.composables.appbar.BaseTopAppBar
 import com.example.ui.base.composables.appbar.BaseTopAppBarState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,28 +38,7 @@ fun SmartSolarScreen(smartSolarScreenViewModel: SmartSolarScreenViewModel,goBack
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text("Atrás")
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = goBack
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            contentDescription = null
-                        )
-                    }
-                },
-                colors = TopAppBarColors(
-                    containerColor = Color.White,
-                    scrolledContainerColor = Color.White,
-                    navigationIconContentColor = colorResource(R.color.light_orange),
-                    titleContentColor = colorResource(R.color.light_orange),
-                    actionIconContentColor = Color.White,
-                )
-            )
+            BaseTopAppBar(getBaseTopAppBarState(goBack))
         }
     ) { innerPadding ->
         Column(
@@ -73,7 +48,7 @@ fun SmartSolarScreen(smartSolarScreenViewModel: SmartSolarScreenViewModel,goBack
                 .background(Color.White)
         ) {
             Text(
-                text = "Smart Solar",
+                text = stringResource(R.string.smartSolar_screen_title),
                 fontWeight = FontWeight.Bold,
                 fontSize = 40.sp,
                 modifier = Modifier.padding(20.dp)
