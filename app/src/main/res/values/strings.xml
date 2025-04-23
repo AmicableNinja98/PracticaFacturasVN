@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">PracticaFacturas</string>
+    <string name="homeScreen_facturasCard_title">Facturas</string>
+    <string name="homeScreen_smartSolarCard_title">Smart Solar</string>
+    <string name="homeScreen_title">Bienvenido</string>
 </resources>

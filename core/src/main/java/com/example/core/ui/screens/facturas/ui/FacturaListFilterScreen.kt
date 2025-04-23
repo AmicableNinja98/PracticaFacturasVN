@@ -9,8 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -317,11 +317,11 @@ fun FacturaDatePicker(
     DatePickerDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
-            Button(
-                onClick = onClick
-            ) {
-                Text(stringResource(R.string.filter_popUp_confirm_text))
-            }
+            BaseButton(
+                onClick = onClick,
+                text = stringResource(R.string.filter_popUp_confirm_text),
+                colors = ButtonDefaults.buttonColors()
+            )
         }
     ) {
         DatePicker(

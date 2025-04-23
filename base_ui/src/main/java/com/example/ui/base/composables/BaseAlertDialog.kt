@@ -3,7 +3,6 @@ package com.example.ui.base.composables
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,17 +37,16 @@ fun BaseAlertDialog(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Button(
+                BaseButton(
                     onClick = onDismiss,
                     colors = ButtonColors(
                         containerColor = colorResource(R.color.green_button),
                         contentColor = Color.White,
                         disabledContainerColor = Color.Transparent,
                         disabledContentColor = Color.Transparent,
-                    )
-                ) {
-                    Text(closeButtonText)
-                }
+                    ),
+                    text = closeButtonText
+                )
             }
         }
     )
