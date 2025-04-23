@@ -1,11 +1,13 @@
 package com.example.core.ui.screens.facturas.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,17 +16,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -33,61 +33,45 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.R
 import com.example.core.extensions.toFormattedDisplayDateOrNull
-import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
 import com.example.core.ui.screens.facturas.usecase.list.FacturaListState
 import com.example.core.ui.screens.facturas.usecase.list.FacturaListViewModel
+import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
 import com.example.domain.factura.Factura
 import com.example.ui.base.composables.BaseAlertDialog
 import com.example.ui.base.composables.LoadingScreen
 import com.example.ui.base.composables.NoDataScreen
+import com.example.ui.base.composables.appbar.AppBarActions
+import com.example.ui.base.composables.appbar.BaseTopAppBar
+import com.example.ui.base.composables.appbar.BaseTopAppBarState
+
+data class FacturaListEvents(
+    val goToFilter: () -> Unit,
+    val goBack: () -> Unit,
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FacturaListScreenHost(
     facturaListViewModel: FacturaListViewModel,
-    useMock : Boolean,
+    useMock: Boolean,
     sharedViewModel: FacturaSharedViewModel,
     goToFilter: () -> Unit,
     goBack: () -> Unit
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        stringResource(R.string.facturaList_screen_appbar_title),
-                        color = colorResource(R.color.light_orange)
+            BaseTopAppBar(
+                appBarState = getTopAppBarState(
+                    events = FacturaListEvents(
+                        goToFilter = goToFilter,
+                        goBack = goBack,
                     )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = goBack
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                            tint = colorResource(R.color.light_orange),
-                            contentDescription = null
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            facturaListViewModel.sendIds(sharedViewModel)
-                            goToFilter()
-                        }
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.filtericon),
-                            contentDescription = null
-                        )
-                    }
-                }
+                )
             )
-        }
+        },
     ) { innerPadding ->
         LaunchedEffect(Unit) {
-            facturaListViewModel.getFacturasFromApiOrDatabase(sharedViewModel,useMock)
+            facturaListViewModel.getFacturasFromApiOrDatabase(sharedViewModel, useMock)
         }
         when (facturaListViewModel.state) {
             is FacturaListState.Loading -> LoadingScreen(
@@ -108,7 +92,7 @@ fun FacturaListScreenHost(
 @Composable
 fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
     LazyColumn(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize().background(color = Color.White),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -187,5 +171,25 @@ fun FacturaItemPopUp(title: String, message: String, onDismiss: () -> Unit) {
         message = message,
         onDismiss = onDismiss,
         closeButtonText = stringResource(R.string.close_popUp)
+    )
+}
+
+@Composable
+fun getTopAppBarState(
+    events: FacturaListEvents,
+): BaseTopAppBarState {
+    return BaseTopAppBarState(
+        title = stringResource(R.string.facturaList_screen_appbar_title),
+        icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+        goBackAction = events.goBack,
+        actions = listOf(
+            AppBarActions.PainterAppBarActions(
+                icon = painterResource(R.drawable.filtericon),
+                contentDescription = "",
+                onClick = {
+                    events.goToFilter()
+                }
+            )
+        )
     )
 }

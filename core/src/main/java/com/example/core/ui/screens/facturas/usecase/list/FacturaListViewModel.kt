@@ -64,13 +64,6 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
         }
     }
 
-    fun sendIds(sharedViewModel: FacturaSharedViewModel) {
-        if (state is FacturaListState.Success)
-            sharedViewModel.setIds((state as FacturaListState.Success).facturas.map {
-                it.id
-            }.toMutableList())
-    }
-
     @VisibleForTesting
     fun setTestState(newState: FacturaListState) {
         state = newState

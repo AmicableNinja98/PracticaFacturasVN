@@ -1,5 +1,6 @@
 package com.example.practicafacturas.home.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.practicafacturas.home.usecase.HomeScreenViewModel
@@ -39,6 +41,7 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(color = Color.White)
             .padding(16.dp),
     ) {
         Text(
@@ -49,7 +52,6 @@ fun HomeScreen(
         Text(text = "Usar datos Mock: ${if(homeScreenViewModel.useMockData) "Si" else "No"}")
         Switch(
             checked = homeScreenViewModel.useMockData,
-            //enabled = homeScreenViewModel.isSwitchEnabled,
             onCheckedChange = {
                     value ->
                 homeScreenViewModel.setUseMockDataValue(value)
@@ -68,7 +70,6 @@ fun HomeScreen(
                     icon = Icons.AutoMirrored.Filled.List,
                     onClick = {
                         onNavigateToFacturas(homeScreenViewModel.useMockData)
-                        homeScreenViewModel.setIsSwitchEnabledValue(false)
                     }
                 )
             }

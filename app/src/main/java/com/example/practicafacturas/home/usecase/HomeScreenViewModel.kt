@@ -12,14 +12,7 @@ class HomeScreenViewModel @Inject constructor() : ViewModel() {
     var useMockData by mutableStateOf(false)
         private set
 
-    var isSwitchEnabled by mutableStateOf(true)
-        private set
-
     fun setUseMockDataValue(value : Boolean){
         useMockData = value
-    }
-
-    fun setIsSwitchEnabledValue(value: Boolean){
-        isSwitchEnabled = value
     }
 }
