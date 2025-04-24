@@ -16,5 +16,4 @@
 build
 .kotlin
 htmlReport
-gradle.properties
 local.properties
