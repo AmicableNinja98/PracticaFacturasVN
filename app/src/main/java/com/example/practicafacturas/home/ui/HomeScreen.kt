@@ -22,6 +22,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,47 +42,54 @@ fun HomeScreen(
     onNavigateToFacturas: (Boolean) -> Unit,
     onNavigateToSmartSolar: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.White)
-            .padding(16.dp),
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(homeScreenViewModel.snackbarHostState)
+        }
     ) {
-        Text(
-            text = stringResource(R.string.homeScreen_title),
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(top = 12.dp,bottom = 24.dp)
-        )
-        Text(text = "Usar datos Mock: ${if(homeScreenViewModel.useMockData) "Si" else "No"}")
-        Switch(
-            checked = homeScreenViewModel.useMockData,
-            onCheckedChange = {
-                    value ->
-                homeScreenViewModel.setUseMockDataValue(value)
-            },
-        )
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = Color.White)
+                .padding(innerPadding),
         ) {
-            item {
-                HomeCard(
-                    title = stringResource(R.string.homeScreen_facturasCard_title),
-                    icon = Icons.AutoMirrored.Filled.List,
-                    onClick = {
-                        onNavigateToFacturas(homeScreenViewModel.useMockData)
-                    }
-                )
-            }
-            item {
-                HomeCard(
-                    title = stringResource(R.string.homeScreen_smartSolarCard_title),
-                    icon = Icons.Filled.Star,
-                    onClick = onNavigateToSmartSolar
-                )
+            Text(
+                text = stringResource(R.string.homeScreen_title),
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(top = 12.dp,bottom = 24.dp)
+            )
+            Text(text = "Usar datos Mock: ${if(homeScreenViewModel.useMockData) "Si" else "No"}")
+            Switch(
+                checked = homeScreenViewModel.useMockData,
+                onCheckedChange = {
+                        value ->
+                    homeScreenViewModel.onSwitchCheckedChange(value)
+                },
+            )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
+                    HomeCard(
+                        title = stringResource(R.string.homeScreen_facturasCard_title),
+                        icon = Icons.AutoMirrored.Filled.List,
+                        onClick = {
+                            onNavigateToFacturas(homeScreenViewModel.useMockData)
+                        }
+                    )
+                }
+                item {
+                    HomeCard(
+                        title = stringResource(R.string.homeScreen_smartSolarCard_title),
+                        icon = Icons.Filled.Star,
+                        onClick = onNavigateToSmartSolar
+                    )
+                }
             }
         }
     }

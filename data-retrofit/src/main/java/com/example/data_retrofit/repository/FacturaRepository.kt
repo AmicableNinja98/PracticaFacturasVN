@@ -10,8 +10,6 @@ import javax.inject.Inject
 
 /**
  * Repositorio que se encarga de enlazar los viewModel de la entidad Factura con la api y la base de datos local.
- * @param facturaApiService -> Servicio de donde se recogen los datos.
- * @param facturaDao -> Dao que usaremos para guardar los datos recogidos de la api en la base de datos local.
  */
 class FacturaRepository @Inject constructor(
     @RealApi private val facturaApiService: FacturaApiService,
@@ -35,10 +33,6 @@ class FacturaRepository @Inject constructor(
 
     fun getFacturasFromDatabase() = facturaDao.getAllFacturas()
 
-    /**
-     * Inserta una factura en la base de datos.
-     * @param facturaApi -> Factura recogida de la api a insertar.
-     */
     suspend fun insertFactura(facturaApi: FacturaApi) {
         facturaDao.insertFactura(
             Factura(
