@@ -17,9 +17,9 @@ class FacturaSharedViewModel @Inject constructor() : ViewModel() {
         state.idList = ids.toMutableList()
     }
 
-    fun getFilters() : Boolean = state.filtersApplied
+    fun areFiltersApplied() : Boolean = state.filtersApplied
 
-    fun setFilters(value : Boolean){
+    fun setAreFiltersApplied(value : Boolean){
         state.filtersApplied = value
     }
 
