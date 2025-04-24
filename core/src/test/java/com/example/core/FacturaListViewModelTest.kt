@@ -35,7 +35,7 @@ class FacturaListViewModelTest {
     @Test
     fun `getFacturasFromApiOrDatabase with filters returns Success`() = runTest {
         val factura = Factura(id = 1, descEstado = "Pagada", importeOrdenacion = 12.0, fecha = "2024-02-02")
-        whenever(sharedViewModel.getFilters()).thenReturn(true)
+        whenever(sharedViewModel.areFiltersApplied()).thenReturn(true)
         whenever(sharedViewModel.getIds()).thenReturn(listOf(1))
         whenever(repository.getFacturaById(1)).thenReturn(factura)
 
@@ -49,7 +49,7 @@ class FacturaListViewModelTest {
 
     @Test
     fun `getFacturasFromApiOrDatabase with filters returns NoData`() = runTest {
-        whenever(sharedViewModel.getFilters()).thenReturn(true)
+        whenever(sharedViewModel.areFiltersApplied()).thenReturn(true)
         whenever(sharedViewModel.getIds()).thenReturn(listOf(1))
         whenever(repository.getFacturaById(1)).thenReturn(null)
 
@@ -63,7 +63,7 @@ class FacturaListViewModelTest {
     @Test
     fun `getFacturasFromApiOrDatabase without filters returns Success from DB`() = runTest {
         val facturaList = listOf(Factura(id = 1, descEstado = "Pagada", importeOrdenacion = 12.0, fecha = "2024-02-02"))
-        whenever(sharedViewModel.getFilters()).thenReturn(false)
+        whenever(sharedViewModel.areFiltersApplied()).thenReturn(false)
         whenever(repository.getFacturasFromDatabase()).thenReturn(flowOf(facturaList))
 
         viewModel.getFacturasFromApiOrDatabase(sharedViewModel)
@@ -78,7 +78,7 @@ class FacturaListViewModelTest {
     fun `getFacturasFromApiOrDatabase loads from API when DB is empty`() = runTest {
         val facturaList = listOf(Factura(id = 1, descEstado = "Pagada", importeOrdenacion = 12.0, fecha = "2024-02-02"))
 
-        whenever(sharedViewModel.getFilters()).thenReturn(false)
+        whenever(sharedViewModel.areFiltersApplied()).thenReturn(false)
         whenever(repository.getFacturasFromDatabase())
             .thenReturn(flowOf(emptyList()))
             .thenReturn(flowOf(facturaList))
@@ -95,7 +95,7 @@ class FacturaListViewModelTest {
 
     @Test
     fun `getFacturasFromApiOrDatabase returns NoData when all empty`() = runTest {
-        whenever(sharedViewModel.getFilters()).thenReturn(false)
+        whenever(sharedViewModel.areFiltersApplied()).thenReturn(false)
         whenever(repository.getFacturasFromDatabase())
             .thenReturn(flowOf(emptyList()))
             .thenReturn(flowOf(emptyList()))

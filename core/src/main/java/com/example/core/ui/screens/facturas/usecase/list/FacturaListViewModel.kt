@@ -23,6 +23,7 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
     }
 
     private fun resetData(){
+        // Necesitamos hacer esto cada vez que se inicia el viewmodel para poder cambiar de fuente de datos en tiempo de ejecución
         viewModelScope.launch {
             facturaRepository.deleteAll()
             facturaRepository.resetIndexes()
@@ -32,7 +33,7 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
     fun getFacturasFromApiOrDatabase(sharedViewModel: FacturaSharedViewModel, useJson: Boolean = false) {
         viewModelScope.launch {
             state = FacturaListState.Loading
-            if (sharedViewModel.getFilters())
+            if (sharedViewModel.areFiltersApplied())
                 getFilteredFacturas(sharedViewModel)
             else
                 getAllFacturas(useJson)

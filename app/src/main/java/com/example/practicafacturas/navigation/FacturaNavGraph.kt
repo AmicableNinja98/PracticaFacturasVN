@@ -29,7 +29,7 @@ private fun NavGraphBuilder.list(navController: NavController) {
                 defaultValue = false
             }
         )) { backStackEntry ->
-        val useJson = backStackEntry.arguments?.getBoolean("useJson") ?: false
+        val useJson : Boolean = backStackEntry.arguments?.getBoolean("useJson") == true
         val parentEntry =
             remember(backStackEntry) { navController.getBackStackEntry(AppNavGraph.FACTURA) }
         val sharedViewModel = hiltViewModel<FacturaSharedViewModel>(parentEntry)

@@ -55,7 +55,7 @@ fun FacturaListFilterHost(
         facturaListFilterViewModel.getFacturas(facturaSharedViewModel)
     }
 
-    if (facturaListFilterViewModel.state.sinDatos) {
+    if (facturaListFilterViewModel.state.sinDatosAlFiltrar) {
         openDialog.value = true
         if (openDialog.value) {
             NoDataFilterPopUp(
@@ -284,7 +284,7 @@ fun SeccionBotones(
                 ),
                 onClick = {
                     facturaListFilterViewModel.onApplyFiltersClick(sharedViewModel)
-                    if (!facturaListFilterViewModel.state.sinDatos) {
+                    if (!facturaListFilterViewModel.state.sinDatosAlFiltrar) {
                         goBack()
                     }
                 },

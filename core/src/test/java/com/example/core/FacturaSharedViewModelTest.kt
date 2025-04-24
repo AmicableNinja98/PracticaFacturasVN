@@ -24,11 +24,11 @@ class FacturaSharedViewModelTest {
 
     @Test
     fun `setFilters updates filtersApplied`() {
-        viewModel.setFilters(true)
-        assertTrue(viewModel.getFilters())
+        viewModel.setAreFiltersApplied(true)
+        assertTrue(viewModel.areFiltersApplied())
 
-        viewModel.setFilters(false)
-        assertFalse(viewModel.getFilters())
+        viewModel.setAreFiltersApplied(false)
+        assertFalse(viewModel.areFiltersApplied())
     }
 
     @Test

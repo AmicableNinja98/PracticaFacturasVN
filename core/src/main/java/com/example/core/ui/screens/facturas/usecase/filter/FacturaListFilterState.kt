@@ -22,7 +22,7 @@ data class FacturaListFilterState(
     var filtroImporteAplicado : Boolean = false,
     var filtroEstadoAplicado : Boolean = false,
 
-    var sinDatos : Boolean = false
+    var sinDatosAlFiltrar : Boolean = false
 )
 
 data class EstadoFiltro(

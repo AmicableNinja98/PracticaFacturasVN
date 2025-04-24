@@ -46,7 +46,7 @@ class FacturaListFilterViewModelTest {
         )
 
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
-        whenever(sharedViewModel.getFilters()).thenReturn(false)
+        whenever(sharedViewModel.areFiltersApplied()).thenReturn(false)
 
         viewModel.getFacturas(sharedViewModel)
         advanceUntilIdle()
@@ -106,7 +106,7 @@ class FacturaListFilterViewModelTest {
         )
 
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
-        whenever(sharedViewModel.getFilters()).thenReturn(false)
+        whenever(sharedViewModel.areFiltersApplied()).thenReturn(false)
 
         viewModel.getFacturas(sharedViewModel)
         advanceUntilIdle()
@@ -117,7 +117,7 @@ class FacturaListFilterViewModelTest {
         val filtered = viewModel.state.facturas
         assertEquals(1, filtered.size)
         assertEquals(1, filtered.first().id)
-        verify(sharedViewModel).setFilters(true)
+        verify(sharedViewModel).setAreFiltersApplied(true)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -128,7 +128,7 @@ class FacturaListFilterViewModelTest {
         )
 
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
-        whenever(sharedViewModel.getFilters()).thenReturn(false)
+        whenever(sharedViewModel.areFiltersApplied()).thenReturn(false)
 
         viewModel.getFacturas(sharedViewModel)
         advanceUntilIdle()
@@ -136,7 +136,7 @@ class FacturaListFilterViewModelTest {
         viewModel.onSliderValueChange(200f..300f)
         viewModel.onApplyFiltersClick(sharedViewModel)
 
-        assertTrue(viewModel.state.sinDatos)
+        assertTrue(viewModel.state.sinDatosAlFiltrar)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -148,7 +148,7 @@ class FacturaListFilterViewModelTest {
         )
 
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
-        whenever(sharedViewModel.getFilters()).thenReturn(false)
+        whenever(sharedViewModel.areFiltersApplied()).thenReturn(false)
 
         viewModel.getFacturas(sharedViewModel)
         advanceUntilIdle()
@@ -162,6 +162,6 @@ class FacturaListFilterViewModelTest {
         assertFalse(state.filtroFechaAplicado)
         assertFalse(state.filtroEstadoAplicado)
         assertFalse(state.filtroImporteAplicado)
-        verify(sharedViewModel).setFilters(false)
+        verify(sharedViewModel).setAreFiltersApplied(false)
     }
 }
