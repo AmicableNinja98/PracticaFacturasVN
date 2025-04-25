@@ -1,5 +1,6 @@
 package com.example.core.extensions
 
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -30,6 +31,15 @@ fun String.toFormattedDisplayDateOrNull(): String? {
 fun String.toLocalDateOrNull(): LocalDate? {
     return try {
         LocalDate.parse(this, DateTimeFormatter.ofPattern("dd-MM-yyyy"))
+    } catch (_: Exception) {
+        null
+    }
+}
+
+fun String.toMillis(pattern: String = "dd/MM/yyyy"): Long? {
+    return try {
+        val formatter = SimpleDateFormat(pattern, Locale.getDefault())
+        formatter.parse(this)?.time
     } catch (_: Exception) {
         null
     }
