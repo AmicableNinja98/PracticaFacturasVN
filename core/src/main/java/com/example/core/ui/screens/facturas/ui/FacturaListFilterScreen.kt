@@ -333,8 +333,7 @@ fun FacturaDatePicker(
 @Composable
 fun ImporteSlider(
     facturaListFilterViewModel: FacturaListFilterViewModel,
-    modifier: Modifier = Modifier,
-    steps: Int = 5
+    modifier: Modifier = Modifier
 ) {
     val importeMinAbsoluto = facturaListFilterViewModel.state.facturas.minOfOrNull { it.importeOrdenacion }
             ?.toFloat() ?: 0f
@@ -365,7 +364,7 @@ fun ImporteSlider(
                 facturaListFilterViewModel.onSliderValueChange(range)
             },
             valueRange = sliderRange,
-            steps = steps,
+            steps = 0,
             colors = SliderColors(
                 thumbColor = colorResource(id = R.color.dark_orange),
                 activeTrackColor = colorResource(id = R.color.dark_orange),
