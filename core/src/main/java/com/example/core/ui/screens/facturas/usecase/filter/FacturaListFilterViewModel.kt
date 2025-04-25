@@ -1,10 +1,8 @@
 package com.example.core.ui.screens.facturas.usecase.filter
 
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.extensions.toLocalDateOrNull
@@ -51,11 +49,11 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
                 importeMax = sharedViewModel.getImporteMax(),
                 fechaInicio = sharedViewModel.getFechaMin(),
                 fechaFin = sharedViewModel.getFechaMax(),
-                estados = mapToEstadoFiltroList(sharedViewModel.getEstados()),
+                estados = sharedViewModel.getEstados(),
                 filtroFechaAplicado = sharedViewModel.getFechaMin() != null || sharedViewModel.getFechaMax() != null,
                 filtroImporteAplicado = sharedViewModel.getImporteMin() != getImporteMinFromFacturas(facturas) || sharedViewModel.getImporteMax() != getImporteMaxFromFacturas(facturas),
                 filtroEstadoAplicado = sharedViewModel.getEstados().any {
-                    it.value == true
+                    it.seleccionado == true
                 }
             )
         } else
@@ -172,17 +170,9 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         sharedViewModel.setFechaMax(state.fechaFin)
         sharedViewModel.setImporteMin(state.importeMin)
         sharedViewModel.setImporteMax(state.importeMax)
-        state.estados.forEach { estado ->
-            sharedViewModel.setEstado(estado.nombre, estado.seleccionado)
+        state.estados.forEachIndexed { index,estado ->
+            sharedViewModel.setEstado(index,estado.seleccionado)
         }
-    }
-
-    private fun mapToEstadoFiltroList(map: Map<String, Boolean>): SnapshotStateList<EstadoFiltro> {
-        val lista = mutableStateListOf<EstadoFiltro>()
-        map.forEach { (key, value) ->
-            lista.add(EstadoFiltro(nombre = key, seleccionado = value))
-        }
-        return lista
     }
 
     private fun getImporteMinFromFacturas(facturas : List<Factura>) = facturas.minOf { it.importeOrdenacion }

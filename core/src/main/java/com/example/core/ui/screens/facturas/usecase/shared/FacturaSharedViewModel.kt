@@ -3,7 +3,9 @@ package com.example.core.ui.screens.facturas.usecase.shared
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
+import com.example.core.ui.screens.facturas.usecase.filter.EstadoFiltro
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -47,9 +49,10 @@ class FacturaSharedViewModel @Inject constructor() : ViewModel() {
         state.filterFechaMax = value
     }
 
-    fun getEstados() : Map<String, Boolean> = state.filterEstados
+    fun getEstados() : SnapshotStateList<EstadoFiltro> = state.filterEstados
 
-    fun setEstado(key : String,value: Boolean){
-        state.filterEstados[key] = value
+    fun setEstado(index : Int,value : Boolean){
+        val estado = state.filterEstados[index]
+        state.filterEstados[index] = estado.copy(seleccionado = value)
     }
 }

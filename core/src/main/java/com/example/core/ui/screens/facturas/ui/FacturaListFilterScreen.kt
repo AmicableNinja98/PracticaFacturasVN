@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CalendarLocale
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -21,10 +22,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.SliderColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +40,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.R
+import com.example.core.extensions.toMillis
+import com.example.core.ui.screens.facturas.usecase.filter.FacturaListFilterState
 import com.example.core.ui.screens.facturas.usecase.filter.FacturaListFilterViewModel
 import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
 import com.example.ui.base.composables.BaseAlertDialog
@@ -138,8 +141,9 @@ fun FacturaListFilter(
 fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
     val openDialogFirstDate = remember { mutableStateOf(false) }
     val openDialogSecondDate = remember { mutableStateOf(false) }
-    val datePickerFirstDateState = rememberDatePickerState()
-    val datePickerSecondDateState = rememberDatePickerState()
+
+    val datePickerFirstDateState = createRememberDatePickerState(state = facturaListFilterViewModel.state, isStartDate = true)
+    val datePickerSecondDateState = createRememberDatePickerState(state = facturaListFilterViewModel.state)
 
     Text(
         text = stringResource(R.string.filter_date_title),
@@ -333,8 +337,7 @@ fun FacturaDatePicker(
 @Composable
 fun ImporteSlider(
     facturaListFilterViewModel: FacturaListFilterViewModel,
-    modifier: Modifier = Modifier,
-    steps: Int = 5
+    modifier: Modifier = Modifier
 ) {
     val importeMinAbsoluto = facturaListFilterViewModel.state.facturas.minOfOrNull { it.importeOrdenacion }
             ?.toFloat() ?: 0f
@@ -365,7 +368,7 @@ fun ImporteSlider(
                 facturaListFilterViewModel.onSliderValueChange(range)
             },
             valueRange = sliderRange,
-            steps = steps,
+            steps = 0,
             colors = SliderColors(
                 thumbColor = colorResource(id = R.color.dark_orange),
                 activeTrackColor = colorResource(id = R.color.dark_orange),
@@ -391,4 +394,25 @@ fun NoDataFilterPopUp(title: String, message: String, onDismiss: () -> Unit) {
         onDismiss = onDismiss,
         closeButtonText = stringResource(R.string.filter_popUp_close_text)
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun createRememberDatePickerState(state : FacturaListFilterState,isStartDate : Boolean = false) : DatePickerState{
+    val startDateMillis = state.fechaInicio?.toMillis()
+    val endDateMillis = state.fechaFin?.toMillis()
+    val key = "$startDateMillis-$endDateMillis"
+    return remember(key) {
+        DatePickerState(
+            initialSelectedDateMillis = if(isStartDate) startDateMillis else endDateMillis,
+            initialDisplayedMonthMillis = if(isStartDate) startDateMillis ?: System.currentTimeMillis() else endDateMillis ?: System.currentTimeMillis(),
+            yearRange = 2000..2050,
+            selectableDates = object : SelectableDates{
+                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                    return if(isStartDate) endDateMillis?.let { utcTimeMillis <= it } != false else startDateMillis?.let { utcTimeMillis >= it } != false
+                }
+            },
+            locale = CalendarLocale.getDefault()
+        )
+    }
 }
