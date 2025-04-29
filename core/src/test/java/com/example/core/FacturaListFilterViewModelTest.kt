@@ -1,6 +1,6 @@
 package com.example.core
 
-import com.example.core.ui.screens.facturas.usecase.filter.EstadoFiltro
+import com.example.core.extensions.toMillis
 import com.example.core.ui.screens.facturas.usecase.filter.FacturaListFilterViewModel
 import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
 import com.example.data_retrofit.repository.FacturaRepository
@@ -18,14 +18,12 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.text.SimpleDateFormat
 
 class FacturaListFilterViewModelTest {
     private lateinit var viewModel: FacturaListFilterViewModel
     private lateinit var facturaRepository: FacturaRepository
-    private lateinit var sharedViewModel: FacturaSharedViewModel
     private val testDispatcher = StandardTestDispatcher()
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -33,20 +31,23 @@ class FacturaListFilterViewModelTest {
     fun setUp() {
         facturaRepository = mock()
         Dispatchers.setMain(testDispatcher)
-        sharedViewModel = mock()
         viewModel = FacturaListFilterViewModel(facturaRepository)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `getFacturas sets initial state without filters`() = runTest {
+        val sharedViewModel = FacturaSharedViewModel().apply {
+            setAreFiltersApplied(false)
+            setFechaMin(null)
+            setFechaMax(null)
+        }
         val facturas = listOf(
             Factura(1, "Pagada", 100.0, "01/01/2024"),
             Factura(2, "Pagada", 300.0, "01/02/2024")
         )
 
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
-        whenever(sharedViewModel.areFiltersApplied()).thenReturn(false)
 
         viewModel.getFacturas(sharedViewModel)
         advanceUntilIdle()
@@ -59,18 +60,132 @@ class FacturaListFilterViewModelTest {
                     factura -> factura.importeOrdenacion
             }, importeMax)
             assertEquals(facturas, this.facturas)
+            assertFalse(filtroFechaAplicado)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `getFacturas sets initial state with previousFilterApplied if some filters were applied before`() = runTest {
+        val facturasTest = listOf(Factura(1, "Pagada", 100.0, "01/01/2024"))
+        val sharedViewModel = FacturaSharedViewModel().apply {
+            setAreFiltersApplied(true)
+            setFechaMin(null)
+            setFechaMax("10/01/2024")
+            setImporteMax(120.0)
+        }
+
+        whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturasTest))
+
+        viewModel.getFacturas(sharedViewModel)
+        advanceUntilIdle()
+
+        with(viewModel.state) {
+            assertEquals(facturasTest,facturas)
+            assertEquals(importeMax,120.0)
+            assertEquals(fechaFin,"10/01/2024")
+            assertFalse(estados.any {
+                it.seleccionado
+            })
+            assertFalse(filtroEstadoAplicado)
+            assertTrue(filtroImporteAplicado)
+            assertTrue(filtroFechaAplicado)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `getFacturas sets initial state with previousFilterApplied if other filters were applied before`() = runTest {
+        val facturasTest = listOf(Factura(1, "Pagada", 100.0, "01/01/2024"))
+        val sharedViewModel = FacturaSharedViewModel().apply {
+            setAreFiltersApplied(true)
+            setFechaMin("01/01/2024")
+            setFechaMax(null)
+            setImporteMin(100.0)
+            setImporteMax(100.0)
+            setEstado(0,true)
+            setEstado(2,true)
+        }
+
+        whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturasTest))
+
+        viewModel.getFacturas(sharedViewModel)
+        advanceUntilIdle()
+
+        with(viewModel.state) {
+            assertEquals(facturasTest,facturas)
+            assertTrue(estados.any{
+                it.seleccionado
+            })
+            assertTrue(filtroEstadoAplicado)
+            assertFalse(filtroImporteAplicado)
+            assertTrue(filtroFechaAplicado)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `filtroFechaAplicado is true if both dates are set`() = runTest{
+        val facturasTest = listOf(Factura(1, "Pagada", 100.0, "01/01/2024"))
+        val sharedViewModel = FacturaSharedViewModel().apply {
+            setAreFiltersApplied(true)
+            setFechaMin("01/01/2023")
+            setFechaMax("12/02/2024")
+        }
+
+        whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturasTest))
+
+        viewModel.getFacturas(sharedViewModel)
+        advanceUntilIdle()
+
+        with(viewModel.state) {
+            assertEquals(fechaInicio,"01/01/2023")
+            assertEquals(fechaFin,"12/02/2024")
+            assertTrue(filtroFechaAplicado)
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `getFacturas does nothing if database is empty`() = runTest{
+        whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(emptyList()))
+        val sharedViewModel = FacturaSharedViewModel().apply {
+            setAreFiltersApplied(false)
+        }
+
+        viewModel.getFacturas(sharedViewModel)
+        advanceUntilIdle()
+        with(viewModel.state) {
+            assertTrue(facturas.isEmpty())
+            assertEquals(importeMin,0.0)
+            assertEquals(importeMax,0.0)
+            assertEquals(fechaInicio,null)
+            assertEquals(fechaFin,null)
+            assertTrue(estados.all {
+                it.seleccionado == false
+            })
+            assertEquals(filtroFechaAplicado,false)
+            assertEquals(filtroImporteAplicado,false)
+            assertEquals(filtroEstadoAplicado,false)
+            assertEquals(sinDatosAlFiltrar,false)
         }
     }
 
     @Test
     fun `onCheckedChange toggles estado selection`() = runTest {
-        val estado = EstadoFiltro("Pendiente de pago", false)
-        viewModel.state.estados.add(estado)
-
         viewModel.onCheckedChange(0)
 
         assertTrue(viewModel.state.estados[0].seleccionado)
         assertTrue(viewModel.state.filtroEstadoAplicado)
+    }
+
+    @Test
+    fun `onCheckedChange toggles filtroEstadoSeleccionado to false if none are selected`() = runTest{
+        viewModel.onCheckedChange(0)
+        viewModel.onCheckedChange(0)
+
+        assertFalse(viewModel.state.estados[0].seleccionado)
+        assertFalse(viewModel.state.filtroEstadoAplicado)
     }
 
     @Test
@@ -87,6 +202,16 @@ class FacturaListFilterViewModelTest {
     }
 
     @Test
+    fun `onDateChanged does nothing if date is null`() = runTest {
+        viewModel.onDateChanged(null,isStartDate = true)
+        viewModel.onDateChanged(null)
+
+        assertEquals(null, viewModel.state.fechaInicio)
+        assertEquals(null, viewModel.state.fechaFin)
+        assertFalse(viewModel.state.filtroFechaAplicado)
+    }
+
+    @Test
     fun `onSliderValueChange updates importe and flag`() = runTest {
         viewModel.onSliderValueChange(100f..300f)
 
@@ -99,25 +224,80 @@ class FacturaListFilterViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `onApplyFiltersClick filters facturas and updates sharedViewModel`() = runTest {
+    fun `onApplyFiltersClick filters facturas with all filters applied and updates sharedViewModel`() = runTest {
         val facturas = listOf(
-            Factura(1, "Pagada", 100.0, "01/01/2024"),
-            Factura(2, "Pagada", 300.0, "01/02/2024")
+            Factura(1, "Pagada", 100.0, "01/04/2024"),
+            Factura(2, "Pagada", 300.0, "01/06/2024")
         )
+        val sharedViewModel = FacturaSharedViewModel().apply {
+            setAreFiltersApplied(false)
+        }
 
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
-        whenever(sharedViewModel.areFiltersApplied()).thenReturn(false)
 
         viewModel.getFacturas(sharedViewModel)
         advanceUntilIdle()
 
         viewModel.onSliderValueChange(90f..150f)
+        viewModel.onDateChanged("01/02/2024".toMillis(),isStartDate = true)
+        viewModel.onDateChanged("01/05/2024".toMillis())
+        viewModel.onCheckedChange(0)
         viewModel.onApplyFiltersClick(sharedViewModel)
 
         val filtered = viewModel.state.facturas
         assertEquals(1, filtered.size)
         assertEquals(1, filtered.first().id)
-        verify(sharedViewModel).setAreFiltersApplied(true)
+        assertEquals(sharedViewModel.areFiltersApplied(),true)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `onApplyFiltersClick filters facturas with only end date filter applied and updates sharedViewModel`() = runTest {
+        val facturas = listOf(
+            Factura(1, "Pagada", 100.0, "01/04/2024"),
+            Factura(2, "Pagada", 300.0, "01/06/2024")
+        )
+        val sharedViewModel = FacturaSharedViewModel().apply {
+            setAreFiltersApplied(false)
+        }
+
+        whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
+
+        viewModel.getFacturas(sharedViewModel)
+        advanceUntilIdle()
+
+        viewModel.state.fechaInicio = null
+        viewModel.onDateChanged("01/05/2024".toMillis())
+        viewModel.onApplyFiltersClick(sharedViewModel)
+
+        val filtered = viewModel.state.facturas
+        assertEquals(1, filtered.size)
+        assertEquals(1, filtered.first().id)
+        assertEquals(sharedViewModel.areFiltersApplied(),true)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `onApplyFiltersClick does not filter facturas by date if startDate or endDate format is not correct`() = runTest{
+        val facturas = listOf(
+            Factura(1, "Pagada", 100.0, "Monday,28th April"),
+            Factura(2, "Pagada", 300.0, "Tuesday,29th April")
+        )
+        val sharedViewModel = FacturaSharedViewModel().apply {
+            setAreFiltersApplied(false)
+        }
+
+        whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
+
+        viewModel.getFacturas(sharedViewModel)
+        advanceUntilIdle()
+
+        viewModel.state.fechaFin = null
+        viewModel.onDateChanged("01/05/2024".toMillis())
+        viewModel.onApplyFiltersClick(sharedViewModel)
+
+        val filtered = viewModel.state.facturas
+        assertEquals(facturas.size, filtered.size)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -126,9 +306,11 @@ class FacturaListFilterViewModelTest {
         val facturas = listOf(
             Factura(1, "Pagada", 100.0, "01/01/2024")
         )
+        val sharedViewModel = FacturaSharedViewModel().apply {
+            setAreFiltersApplied(false)
+        }
 
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
-        whenever(sharedViewModel.areFiltersApplied()).thenReturn(false)
 
         viewModel.getFacturas(sharedViewModel)
         advanceUntilIdle()
@@ -146,9 +328,11 @@ class FacturaListFilterViewModelTest {
             Factura(1, "Pagada", 100.0, "01/01/2024"),
             Factura(2, "Pagada", 300.0, "01/02/2024")
         )
+        val sharedViewModel = FacturaSharedViewModel().apply {
+            setAreFiltersApplied(false)
+        }
 
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturas))
-        whenever(sharedViewModel.areFiltersApplied()).thenReturn(false)
 
         viewModel.getFacturas(sharedViewModel)
         advanceUntilIdle()
@@ -162,6 +346,17 @@ class FacturaListFilterViewModelTest {
         assertFalse(state.filtroFechaAplicado)
         assertFalse(state.filtroEstadoAplicado)
         assertFalse(state.filtroImporteAplicado)
-        verify(sharedViewModel).setAreFiltersApplied(false)
+        assertEquals(sharedViewModel.areFiltersApplied(),false)
     }
+
+    /*@OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `getImporteMinFromFacturas and getImporteMaxFromFacturas return Double`() = runTest{
+        val facturas = listOf(
+            Factura(1, "Pagada", 100.0, "01/01/2024"),
+            Factura(2, "Pagada", 300.0, "01/02/2024")
+        )
+
+        val importeMin = viewModel.getImporteMinFromFacturas(facturas)
+    }*/
 }

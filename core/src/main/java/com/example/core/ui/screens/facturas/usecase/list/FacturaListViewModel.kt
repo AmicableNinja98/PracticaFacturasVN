@@ -64,9 +64,4 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
                 state = FacturaListState.Success(facturas)
         }
     }
-
-    @VisibleForTesting
-    fun setTestState(newState: FacturaListState) {
-        state = newState
-    }
 }

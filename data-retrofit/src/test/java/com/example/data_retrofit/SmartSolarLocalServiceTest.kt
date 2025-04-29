@@ -4,11 +4,10 @@ import android.content.Context
 import android.content.res.AssetManager
 import com.example.data_retrofit.repository.SmartSolarLocalService
 import com.example.domain.use_details.UseDetails
-import junit.framework.TestCase.assertEquals
-import junit.framework.TestCase.assertNull
 import kotlinx.coroutines.runBlocking
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import java.io.ByteArrayInputStream
@@ -19,7 +18,7 @@ class SmartSolarLocalServiceTest {
     private lateinit var assets: AssetManager
     private lateinit var service: SmartSolarLocalService
 
-    @Before
+    @BeforeEach
     fun setup() {
         context = mock()
         assets = mock()
@@ -55,7 +54,7 @@ class SmartSolarLocalServiceTest {
                 potencia = "5kW"
             )
 
-            assertEquals(expected, result)
+            Assertions.assertEquals(expected, result)
         }
     }
 
@@ -66,7 +65,7 @@ class SmartSolarLocalServiceTest {
 
             val result = service.getUseDetails()
 
-            assertNull(result)
+            Assertions.assertNull(result)
         }
     }
 }

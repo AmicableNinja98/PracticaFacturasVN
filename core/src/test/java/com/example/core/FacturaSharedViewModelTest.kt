@@ -58,11 +58,22 @@ class FacturaSharedViewModelTest {
     }
 
     @Test
-    fun `setEstado updates filterEstados`() {
-        viewModel.setEstado("Pagada", true)
-        assertTrue(viewModel.getEstados()["Pagada"] == true)
+    fun `getEstados returns initial filterEstados list`() {
+        val estados = viewModel.getEstados()
+        assertEquals(5, estados.size)
 
-        viewModel.setEstado("Pendiente", false)
-        assertTrue(viewModel.getEstados()["Pendiente"] == false)
+        assertEquals("Pagada", estados[0].nombre)
+        assertEquals(false, estados[0].seleccionado)
+    }
+
+    @Test
+    fun `setEstado updates selection state of a specific EstadoFiltro`() {
+        val estados = viewModel.getEstados()
+
+        viewModel.setEstado(0, true)
+        assertTrue(estados[0].seleccionado)
+
+        viewModel.setEstado(1, false)
+        assertFalse(estados[1].seleccionado)
     }
 }

@@ -1,20 +1,25 @@
 package com.example.data_retrofit
 
+import co.infinum.retromock.Retromock
 import com.example.data_retrofit.database.FacturaDao
 import com.example.data_retrofit.repository.FacturaRepository
+import com.example.data_retrofit.services.AssetsBodyFactory
 import com.example.data_retrofit.services.FacturaApiService
 import com.example.data_retrofit.services.MockApi
 import com.example.data_retrofit.services.RealApi
 import com.example.domain.factura.Factura
 import com.example.domain.factura_response.FacturaApi
 import com.example.domain.factura_response.FacturaResponse
-import junit.framework.TestCase.assertEquals
+import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.check
 import org.mockito.kotlin.mock
@@ -23,20 +28,38 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import retrofit2.Response
+import retrofit2.Retrofit
 
 class FacturaRepositoryTest {
     private lateinit var facturaDao: FacturaDao
+    private lateinit var retromock : Retromock
     @RealApi
     private lateinit var facturaApiService: FacturaApiService
     @MockApi
     private lateinit var mockFacturaApiService: FacturaApiService
     private lateinit var repository: FacturaRepository
 
-    @Before
+    @BeforeEach
     fun setup() {
         facturaDao = mock()
         facturaApiService = mock()
-        mockFacturaApiService = mock()
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://localhost/")
+            .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            .build()
+
+        retromock = Retromock.Builder()
+            .retrofit(retrofit)
+            .defaultBodyFactory(AssetsBodyFactory("src/test/resources/"))
+            .build()
+
+        mockFacturaApiService = retromock.create(FacturaApiService::class.java)
+
+        repository = FacturaRepository(
+            facturaApiService = mock(),
+            mockFacturaApiService = mockFacturaApiService,
+            facturaDao = facturaDao
+        )
         repository = FacturaRepository(facturaApiService,mockFacturaApiService, facturaDao)
     }
 
@@ -49,9 +72,9 @@ class FacturaRepositoryTest {
 
             verify(facturaDao).insertFactura(
                 check {
-                    assertEquals("Emitida", it.descEstado)
-                    assertEquals(99.9, it.importeOrdenacion)
-                    assertEquals("2024-04-01", it.fecha)
+                    Assertions.assertEquals("Emitida", it.descEstado)
+                    Assertions.assertEquals(99.9, it.importeOrdenacion)
+                    Assertions.assertEquals("2024-04-01", it.fecha)
                 }
             )
         }
@@ -69,9 +92,8 @@ class FacturaRepositoryTest {
 
             val result = repository.getFacturaById(1)
 
-            assertEquals(factura, result)
+            Assertions.assertEquals(factura, result)
         }
-
 
     @Test
     fun `getDataFromApiAndInsertToDatabase saves data when response is successful`() =
@@ -90,6 +112,14 @@ class FacturaRepositoryTest {
         }
 
     @Test
+    fun `getDataFromApiAndInsertToDatabase saves data when response is successful using mock`() =
+        runTest {
+            repository.getDataFromApiAndInsertToDatabase(true)
+
+            verify(facturaDao, times(11)).insertFactura(any())
+        }
+
+    @Test
     fun `getFacturasFromDatabase returns flow from DAO`() =
         runTest {
             val list = listOf(
@@ -105,7 +135,7 @@ class FacturaRepositoryTest {
             val flow = repository.getFacturasFromDatabase()
             val result = flow.first()
 
-            assertEquals(list, result)
+            Assertions.assertEquals(list, result)
         }
 
     @Test
@@ -158,4 +188,16 @@ class FacturaRepositoryTest {
 
             verify(facturaDao,never()).insertFactura(any())
         }
+
+    @Test
+    fun `deleteAll calls DAO deleteAll`() = runTest {
+        repository.deleteAll()
+        verify(facturaDao).deleteAll()
+    }
+
+    @Test
+    fun `resetIndexes calls DAO deletePrimaryKeyIndex`() = runTest {
+        repository.resetIndexes()
+        verify(facturaDao).deletePrimaryKeyIndex()
+    }
 }
