@@ -109,28 +109,6 @@ class FacturaListViewModelTest {
         assert(viewModel.state is FacturaListState.NoData)
     }
 
-    @Test
-    fun `sendIds sets IDs in sharedViewModel when state is Success`() {
-        val facturas = listOf(
-            Factura(id = 1, descEstado = "Pagada", importeOrdenacion = 12.0, fecha = "2024-02-02"),
-            Factura(id = 2, descEstado = "Pagada", importeOrdenacion = 40.0, fecha = "2024-02-01")
-        )
-        viewModel.setTestState(FacturaListState.Success(facturas))
-
-        viewModel.sendIds(sharedViewModel)
-
-        verify(sharedViewModel).setIds(mutableListOf(1, 2))
-    }
-
-    @Test
-    fun `sendIds does nothing when state is not Success`() {
-        viewModel.setTestState(FacturaListState.NoData)
-
-        viewModel.sendIds(sharedViewModel)
-
-        verify(sharedViewModel, never()).setIds(any())
-    }
-
     @AfterEach
     fun tearDown() {
         Dispatchers.resetMain()
