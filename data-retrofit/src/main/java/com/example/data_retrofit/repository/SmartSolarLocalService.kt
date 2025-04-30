@@ -7,15 +7,12 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-class SmartSolarLocalService @Inject constructor(
-    @ApplicationContext private val context: Context
-) : SmartSolarService {
+class SmartSolarLocalService @Inject constructor(@ApplicationContext private val context: Context) : SmartSolarService {
 
     override suspend fun getUseDetails(): UseDetails? {
         return try {
-            val jsonString = context.assets.open("use_details.json")
-                .bufferedReader()
-                .use { it.readText() }
+            val bufferedReader = context.assets.open("use_details.json").bufferedReader()
+            val jsonString = bufferedReader.use { it.readText() }
 
             val json = Json {
                 ignoreUnknownKeys = true
