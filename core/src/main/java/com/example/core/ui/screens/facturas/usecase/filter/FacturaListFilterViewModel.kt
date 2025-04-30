@@ -18,7 +18,8 @@ import javax.inject.Inject
 import kotlin.math.ceil
 
 @HiltViewModel
-class FacturaListFilterViewModel @Inject constructor(val facturaRepository: FacturaRepository) : ViewModel() {
+class FacturaListFilterViewModel @Inject constructor(val facturaRepository: FacturaRepository) :
+    ViewModel() {
     var state by mutableStateOf<FacturaListFilterState>(FacturaListFilterState())
         private set
 
@@ -26,7 +27,8 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
 
     private var formatToApplyToDates = "dd/MM/yyyy"
 
-    fun getFacturas(sharedViewModel: FacturaSharedViewModel) = getFacturasFromRepository(sharedViewModel)
+    fun getFacturas(sharedViewModel: FacturaSharedViewModel) =
+        getFacturasFromRepository(sharedViewModel)
 
     private fun getFacturasFromRepository(sharedViewModel: FacturaSharedViewModel) =
         viewModelScope.launch {
@@ -51,7 +53,9 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
                 fechaFin = sharedViewModel.getFechaMax(),
                 estados = sharedViewModel.getEstados(),
                 filtroFechaAplicado = sharedViewModel.getFechaMin() != null || sharedViewModel.getFechaMax() != null,
-                filtroImporteAplicado = sharedViewModel.getImporteMin() != getImporteMinFromFacturas(facturas) || sharedViewModel.getImporteMax() != getImporteMaxFromFacturas(facturas),
+                filtroImporteAplicado = sharedViewModel.getImporteMin() != getImporteMinFromFacturas(
+                    facturas
+                ) || sharedViewModel.getImporteMax() != getImporteMaxFromFacturas(facturas),
                 filtroEstadoAplicado = sharedViewModel.getEstados().any {
                     it.seleccionado == true
                 }
@@ -113,26 +117,25 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         sharedViewModel.setAreFiltersApplied(false)
     }
 
-    fun onApplyFiltersClick(sharedViewModel: FacturaSharedViewModel) = applyFiltersAndUpdateState(sharedViewModel)
+    fun onApplyFiltersClick(sharedViewModel: FacturaSharedViewModel) =
+        applyFiltersAndUpdateState(sharedViewModel)
 
     private fun applyFiltersAndUpdateState(sharedViewModel: FacturaSharedViewModel) {
         val facturasFiltradas = applyFiltersToList()
         if (facturasFiltradas.isNotEmpty()) {
-            state = state.copy(facturas = facturasFiltradas.toMutableList(), sinDatosAlFiltrar = false)
+            state =
+                state.copy(facturas = facturasFiltradas.toMutableList(), sinDatosAlFiltrar = false)
             updateSharedViewModel(sharedViewModel)
         } else
             state = state.copy(sinDatosAlFiltrar = true)
     }
 
     private fun applyFiltersToList(): List<Factura> {
-        val startDate = state.fechaInicio?.replace(
-            "/",
-            "-"
-        )?.toLocalDateOrNull() ?: LocalDate.MIN
-        val endDate = state.fechaFin?.replace(
-            "/",
-            "-"
-        )?.toLocalDateOrNull() ?: LocalDate.MAX
+        val startDateString = state.fechaInicio ?: ""
+        val startDate: LocalDate = startDateString.replace("/", "-").toLocalDateOrNull() ?: LocalDate.MIN
+
+        val endDateString = state.fechaFin ?: ""
+        val endDate: LocalDate = endDateString.replace("/","-").toLocalDateOrNull() ?: LocalDate.MAX
 
         val estadosSeleccionados = state.estados.filter {
             it.seleccionado
@@ -140,11 +143,12 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
 
         // Siempre filtramos a partir de la copia de todas las facturas que obtuvimos de la base de datos
         return facturasOriginalBaseDeDatos.filter { factura ->
-            val facturaDate = factura.fecha.replace("/", "-").toLocalDateOrNull()
+            val facturaDate = if (factura.fecha.isNotEmpty()) factura.fecha.replace("/", "-")
+                .toLocalDateOrNull() else null
 
             val fechaValida = if (state.filtroFechaAplicado && facturaDate != null) {
-                (startDate == null || !facturaDate.isBefore(startDate)) &&
-                        (endDate == null || !facturaDate.isAfter(endDate))
+                (!facturaDate.isBefore(startDate)) &&
+                        (!facturaDate.isAfter(endDate))
             } else true
 
             val importeValido = if (state.filtroImporteAplicado) {
@@ -170,12 +174,14 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
         sharedViewModel.setFechaMax(state.fechaFin)
         sharedViewModel.setImporteMin(state.importeMin)
         sharedViewModel.setImporteMax(state.importeMax)
-        state.estados.forEachIndexed { index,estado ->
-            sharedViewModel.setEstado(index,estado.seleccionado)
+        state.estados.forEachIndexed { index, estado ->
+            sharedViewModel.setEstado(index, estado.seleccionado)
         }
     }
 
-    private fun getImporteMinFromFacturas(facturas : List<Factura>) = facturas.minOf { it.importeOrdenacion }
+    private fun getImporteMinFromFacturas(facturas: List<Factura>) =
+        facturas.minOf { it.importeOrdenacion }
 
-    private fun getImporteMaxFromFacturas(facturas : List<Factura>) = facturas.maxOf { it.importeOrdenacion }
+    private fun getImporteMaxFromFacturas(facturas: List<Factura>) =
+        facturas.maxOf { it.importeOrdenacion }
 }
