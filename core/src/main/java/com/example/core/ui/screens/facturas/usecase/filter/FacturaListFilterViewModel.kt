@@ -129,10 +129,12 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
 
     private fun applyFiltersToList(): List<Factura> {
         val startDateString = state.fechaInicio ?: ""
-        val startDate: LocalDate = startDateString.replace("/", "-").toLocalDateOrNull() ?: LocalDate.MIN
+        val startDate: LocalDate =
+            startDateString.replace("/", "-").toLocalDateOrNull() ?: LocalDate.MIN
 
         val endDateString = state.fechaFin ?: ""
-        val endDate: LocalDate = endDateString.replace("/","-").toLocalDateOrNull() ?: LocalDate.MAX
+        val endDate: LocalDate =
+            endDateString.replace("/", "-").toLocalDateOrNull() ?: LocalDate.MAX
 
         val estadosSeleccionados = state.estados.filter {
             it.seleccionado
@@ -176,8 +178,16 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
     }
 
     private fun getImporteMinFromFacturas(facturas: List<Factura>) =
-        facturas.minOf { it.importeOrdenacion }
+        try {
+            facturas.minOf { it.importeOrdenacion }
+        }catch (_ : NoSuchElementException){
+            0.0
+        }
 
     private fun getImporteMaxFromFacturas(facturas: List<Factura>) =
-        facturas.maxOf { it.importeOrdenacion }
+        try {
+            facturas.maxOf { it.importeOrdenacion }
+        }catch (_ : NoSuchElementException){
+            0.0
+        }
 }
