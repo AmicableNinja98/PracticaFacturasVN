@@ -23,9 +23,9 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
     var state by mutableStateOf<FacturaListFilterState>(FacturaListFilterState())
         private set
 
-    private var facturasOriginalBaseDeDatos = mutableListOf<Factura>()
+    private lateinit var facturasOriginalBaseDeDatos: MutableList<Factura>
 
-    private var formatToApplyToDates = "dd/MM/yyyy"
+    private val formatToApplyToDates = "dd/MM/yyyy"
 
     fun getFacturas(sharedViewModel: FacturaSharedViewModel) =
         getFacturasFromRepository(sharedViewModel)
@@ -71,12 +71,9 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
     fun onCheckedChange(index: Int) {
         val estado = state.estados[index]
         state.estados[index] = estado.copy(seleccionado = !estado.seleccionado)
-        state = if (state.estados.any {
-                it.seleccionado == true
-            })
-            state.copy(filtroEstadoAplicado = true)
-        else
-            state.copy(filtroEstadoAplicado = false)
+        state = state.copy(filtroEstadoAplicado = state.estados.any {
+            it.seleccionado == true
+        })
     }
 
     fun onDateChanged(date: Long?, isStartDate: Boolean = false) {
@@ -141,10 +138,8 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
             it.seleccionado
         }.map { it.nombre }
 
-        // Siempre filtramos a partir de la copia de todas las facturas que obtuvimos de la base de datos
         return facturasOriginalBaseDeDatos.filter { factura ->
-            val facturaDate = if (factura.fecha.isNotEmpty()) factura.fecha.replace("/", "-")
-                .toLocalDateOrNull() else null
+            val facturaDate = factura.fecha.replace("/", "-").toLocalDateOrNull()
 
             val fechaValida = if (state.filtroFechaAplicado && facturaDate != null) {
                 (!facturaDate.isBefore(startDate)) &&
@@ -164,17 +159,18 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
     }
 
     private fun updateSharedViewModel(sharedViewModel: FacturaSharedViewModel) {
-        sharedViewModel.setAreFiltersApplied(true)
-
-        sharedViewModel.setIds(state.facturas.map {
-            it.id
-        }.toMutableList())
-
-        sharedViewModel.setFechaMin(state.fechaInicio)
-        sharedViewModel.setFechaMax(state.fechaFin)
-        sharedViewModel.setImporteMin(state.importeMin)
-        sharedViewModel.setImporteMax(state.importeMax)
-        state.estados.forEachIndexed { index, estado ->
+        val facturasFilterState = state
+        sharedViewModel.apply {
+            setAreFiltersApplied(true)
+            setIds(facturasFilterState.facturas.map {
+                it.id
+            }.toMutableList())
+            setFechaMin(facturasFilterState.fechaInicio)
+            setFechaMax(facturasFilterState.fechaFin)
+            setImporteMin(facturasFilterState.importeMin)
+            setImporteMax(facturasFilterState.importeMax)
+        }
+        facturasFilterState.estados.forEachIndexed { index, estado ->
             sharedViewModel.setEstado(index, estado.seleccionado)
         }
     }
