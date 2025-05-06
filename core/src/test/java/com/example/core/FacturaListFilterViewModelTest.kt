@@ -96,7 +96,7 @@ class FacturaListFilterViewModelTest {
         val facturasTest = listOf(Factura(1, "Pagada", 100.0, "01/01/2024"))
         val sharedViewModel = FacturaSharedViewModel().apply {
             setAreFiltersApplied(true)
-            setImporteMax(120.0)
+            setImporteMin(100.0)
         }
 
         whenever(facturaRepository.getFacturasFromDatabase()).thenReturn(flowOf(facturasTest))
@@ -106,7 +106,7 @@ class FacturaListFilterViewModelTest {
 
         with(viewModel.state) {
             assertEquals(facturasTest,facturas)
-            assertEquals(importeMax,120.0)
+            assertEquals(importeMin,100.0)
             assertFalse(estados.any {
                 it.seleccionado
             })
@@ -359,6 +359,7 @@ class FacturaListFilterViewModelTest {
         advanceUntilIdle()
 
         viewModel.onSliderValueChange(200f..300f)
+        viewModel.onCheckedChange(2)
         viewModel.onApplyFiltersClick(sharedViewModel)
 
         assertTrue(viewModel.state.sinDatosAlFiltrar)
@@ -394,7 +395,7 @@ class FacturaListFilterViewModelTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `getImporteMinFromFacturas and getImporteMaxFromFacturas throws NoSuchElementException when facturas is empty `() = runTest{
+    fun `getImporteMinFromFacturas and getImporteMaxFromFacturas throw NoSuchElementException when facturas is empty `() = runTest{
         val sharedViewModel = FacturaSharedViewModel().apply {
             setAreFiltersApplied(false)
         }
