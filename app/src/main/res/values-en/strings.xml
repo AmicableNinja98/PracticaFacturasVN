@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PracticaFacturas</string>
+    <string name="homeScreen_facturasCard_title">Invoices</string>
+    <string name="homeScreen_title">Welcome</string>
+</resources>
