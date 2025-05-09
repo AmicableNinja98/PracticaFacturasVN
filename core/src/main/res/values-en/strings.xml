@@ -2,13 +2,13 @@
 <resources>
     <string name="factura_list_title">Invoices</string>
     <string name="popUp_title">Information</string>
-    <string name="popUp_message">This functionality is not avaliable</string>
+    <string name="popUp_message">This functionality is not available</string>
     <string name="close_popUp">Close</string>
     <string name="loading_screen_title">Loading invoices...</string>
     <string name="filter_popUp_title">No invoices found</string>
     <string name="filter_popUp_message">There are no invoices that match current filters</string>
     <string name="filter_screen_title">Filter invoices</string>
-    <string name="filter_date_title">Emision date</string>
+    <string name="filter_date_title">Emission date</string>
     <string name="filter_startDate_title">From:</string>
     <string name="filter_date_button_text">day/month/year</string>
     <string name="filter_endDate_title">Until:</string>
