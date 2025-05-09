@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CalendarLocale
@@ -126,6 +128,7 @@ fun FacturaListFilter(
     Column(
         modifier = modifier
             .padding(20.dp)
+            .verticalScroll(rememberScrollState())
     ) {
         SeccionFechas(facturaListFilterViewModel)
         HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(vertical = 15.dp))
