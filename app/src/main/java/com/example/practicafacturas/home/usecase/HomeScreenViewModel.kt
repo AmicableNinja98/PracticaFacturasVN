@@ -18,9 +18,12 @@ class HomeScreenViewModel @Inject constructor() : ViewModel() {
     val snackbarHostState by mutableStateOf(SnackbarHostState())
 
     fun onSwitchCheckedChange(value : Boolean){
-        viewModelScope.launch {
             useMockData = value
-            snackbarHostState.showSnackbar(message = if(useMockData) "Usando datos del Mock" else "Usando datos de la Api")
+    }
+
+    fun showSnackbarMessage(messages : List<String>){
+        viewModelScope.launch {
+            snackbarHostState.showSnackbar(message = if(useMockData) messages.first() else messages[1])
         }
     }
 }

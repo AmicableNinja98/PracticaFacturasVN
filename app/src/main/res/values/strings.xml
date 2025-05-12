@@ -3,4 +3,8 @@
     <string name="homeScreen_facturasCard_title">Facturas</string>
     <string name="homeScreen_smartSolarCard_title" translatable="false">Smart Solar</string>
     <string name="homeScreen_title">Bienvenido</string>
+    <string name="switch_useMockData_affirmativeText">Usar datos Mock: Si</string>
+    <string name="switch_useMockData_negativeText">Usar datos Mock: No</string>
+    <string name="snackbar_usingMock_message">Usando datos del Mock</string>
+    <string name="snackbar_usingApi_message">Usando datos de la Api</string>
 </resources>

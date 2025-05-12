@@ -69,6 +69,9 @@ fun HomeScreenBody(
     onNavigateToSmartSolar: () -> Unit,
     modifier: Modifier
 ) {
+    val snackBarMessages : List<String> = listOf(stringResource(R.string.snackbar_usingMock_message),
+        stringResource(R.string.snackbar_usingApi_message)
+    )
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -86,7 +89,9 @@ fun HomeScreenBody(
         Image(painter = painterResource(R.drawable.logoiberdrola),contentDescription = null)
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
             contentPadding = PaddingValues(8.dp),
             verticalArrangement = Arrangement.Center,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -108,11 +113,14 @@ fun HomeScreenBody(
                 )
             }
         }
-        Text(text = "Usar datos Mock: ${if (homeScreenViewModel.useMockData) "Si" else "No"}")
+        Text(text = if (homeScreenViewModel.useMockData) stringResource(R.string.switch_useMockData_affirmativeText) else stringResource(
+            R.string.switch_useMockData_negativeText
+        ))
         Switch(
             checked = homeScreenViewModel.useMockData,
             onCheckedChange = { value ->
                 homeScreenViewModel.onSwitchCheckedChange(value)
+                homeScreenViewModel.showSnackbarMessage(snackBarMessages)
             },
             colors = SwitchColors(
                 checkedThumbColor = Color.White,
@@ -148,7 +156,8 @@ fun HomeCard(title: String, icon: ImageVector, onClick: () -> Unit) {
     ) {
         Column(
             modifier = Modifier
-                .padding(16.dp).fillMaxSize(),
+                .padding(16.dp)
+                .fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

@@ -33,7 +33,10 @@ import com.example.ui.base.composables.appbar.BaseTopAppBarState
 @Composable
 fun SmartSolarScreen(smartSolarScreenViewModel: SmartSolarScreenViewModel,goBack : () -> Unit) {
     var tabIndex by remember { mutableIntStateOf(0) }
-    val tabData = listOf("Mi instalación", "Energía", "Detalles")
+    val tabData = listOf(stringResource(R.string.smartSolar_installation_tab_title),
+        stringResource(R.string.smartSolar_energy_tab_title),
+        stringResource(R.string.smartSolar_details_tab_title)
+    )
     val pagerState = rememberPagerState { tabData.size }
 
     Scaffold(

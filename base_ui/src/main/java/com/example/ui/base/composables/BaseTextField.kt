@@ -38,7 +38,7 @@ fun BaseReadOnlyTextField(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.baseline_info_outline_24),
-                        tint = Color.Cyan,
+                        tint = Color.Blue,
                         contentDescription = null
                     )
                 }

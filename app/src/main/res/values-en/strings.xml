@@ -3,4 +3,8 @@
     <string name="app_name">PracticaFacturas</string>
     <string name="homeScreen_facturasCard_title">Invoices</string>
     <string name="homeScreen_title">Welcome</string>
+    <string name="switch_useMockData_affirmativeText">Use Mock data: Yes</string>
+    <string name="switch_useMockData_negativeText">Use Mock data: No</string>
+    <string name="snackbar_usingMock_message">Using data from Mock</string>
+    <string name="snackbar_usingApi_message">Using data from Api</string>
 </resources>

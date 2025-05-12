@@ -32,4 +32,13 @@
     <string name="smartSolar_dialog_button_text">Aceptar</string>
     <string name="smartSolar_appbar_title">Atrás</string>
     <string name="smartSolar_screen_title" translatable="false">Smart Solar</string>
+    <string name="factura_descState_pagada">Pagada</string>
+    <string name="factura_descState_anulada">Anulada</string>
+    <string name="factura_descState_cuota_fija">Cuota fija</string>
+    <string name="factura_descState_pendiente_de_pago">Pendiente de pago</string>
+    <string name="factura_descState_plan_de_pago">Plan de pago</string>
+    <string name="smartSolar_installation_tab_title">Mi instalación</string>
+    <string name="smartSolar_energy_tab_title">Energía</string>
+    <string name="smartSolar_details_tab_title">Detalles</string>
+    <string name="smartSolar_installation_autoconsumption_text">"Autoconsumo: "</string>
 </resources>

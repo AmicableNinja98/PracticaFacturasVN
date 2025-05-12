@@ -15,7 +15,10 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CalendarLocale
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxColors
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerColors
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -128,7 +131,7 @@ fun FacturaListFilter(
     Column(
         modifier = modifier
             .padding(20.dp)
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         SeccionFechas(facturaListFilterViewModel)
         HorizontalDivider(thickness = 1.dp, modifier = Modifier.padding(vertical = 15.dp))
@@ -259,7 +262,21 @@ fun SeccionCheckBox(facturaListFilterViewModel: FacturaListFilterViewModel) {
                 checked = estadoFiltro.seleccionado,
                 onCheckedChange = {
                     facturaListFilterViewModel.onCheckedChange(index)
-                }
+                },
+                colors = CheckboxColors(
+                    checkedBoxColor = colorResource(R.color.green_button),
+                    checkedCheckmarkColor = Color.White,
+                    uncheckedCheckmarkColor = Color.Cyan,
+                    uncheckedBoxColor = Color.White,
+                    disabledCheckedBoxColor = Color.Gray,
+                    disabledUncheckedBoxColor = Color.Gray,
+                    disabledIndeterminateBoxColor = Color.Gray,
+                    checkedBorderColor = Color.Gray,
+                    uncheckedBorderColor = Color.Gray,
+                    disabledBorderColor = Color.Gray,
+                    disabledUncheckedBorderColor = Color.Gray,
+                    disabledIndeterminateBorderColor = Color.Gray,
+                )
             )
             Text(estadoFiltro.nombre)
         }
@@ -327,12 +344,14 @@ fun FacturaDatePicker(
             BaseButton(
                 onClick = onClick,
                 text = stringResource(R.string.filter_popUp_confirm_text),
-                colors = ButtonDefaults.buttonColors()
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.green_button)
+                )
             )
         }
     ) {
         DatePicker(
-            state = datePickerState
+            state = datePickerState,
         )
     }
 }
@@ -373,9 +392,9 @@ fun ImporteSlider(
             valueRange = sliderRange,
             steps = 0,
             colors = SliderColors(
-                thumbColor = colorResource(id = R.color.dark_orange),
-                activeTrackColor = colorResource(id = R.color.dark_orange),
-                activeTickColor = colorResource(id = R.color.dark_orange),
+                thumbColor = colorResource(id = R.color.green_button),
+                activeTrackColor = colorResource(id = R.color.green_button),
+                activeTickColor = colorResource(id = R.color.green_button),
                 inactiveTrackColor = Color.LightGray,
                 inactiveTickColor = Color.LightGray,
                 disabledThumbColor = Color.LightGray,

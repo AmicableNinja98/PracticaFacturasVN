@@ -14,8 +14,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -92,7 +94,9 @@ fun FacturaListScreenHost(
 @Composable
 fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
     LazyColumn(
-        modifier = modifier.fillMaxSize().background(color = Color.White),
+        modifier = modifier
+            .fillMaxSize()
+            .background(color = Color.White),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -135,20 +139,28 @@ fun FacturaItem(factura: Factura) {
                 fontSize = 20.sp
             )
             Text(
-                text = factura.descEstado,
+                text = getFacturaStateText(factura),
                 fontSize = 17.sp,
-                color = colorResource(R.color.dark_orange)
+                color = getFacturaStateColor(factura)
             )
         }
 
         Box(
             modifier = Modifier.align(Alignment.CenterVertically)
         ) {
-            Text(
-                "${"%.2f".format(factura.importeOrdenacion)} €",
-                fontSize = 20.sp,
-                modifier = Modifier.padding(end = 16.dp)
-            )
+            Row()
+            {
+                Text(
+                    "${"%.2f".format(factura.importeOrdenacion)} €",
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = Color.Black
+                )
+            }
         }
     }
     HorizontalDivider(thickness = 1.dp)
@@ -172,6 +184,30 @@ fun FacturaItemPopUp(title: String, message: String, onDismiss: () -> Unit) {
         onDismiss = onDismiss,
         closeButtonText = stringResource(R.string.close_popUp)
     )
+}
+
+@Composable
+private fun getFacturaStateText(factura: Factura) : String{
+    return when(factura.descEstado){
+        "Pagada" -> stringResource(R.string.factura_descState_pagada)
+        "Anulada" -> stringResource(R.string.factura_descState_anulada)
+        "Cuota fija" -> stringResource(R.string.factura_descState_cuota_fija)
+        "Pendiente de pago" -> stringResource(R.string.factura_descState_pendiente_de_pago)
+        "Plan de pago" -> stringResource(R.string.factura_descState_plan_de_pago)
+        else -> ""
+    }
+}
+
+@Composable
+private fun getFacturaStateColor(factura: Factura) : Color{
+    return when(factura.descEstado){
+        "Pagada" -> colorResource(R.color.green_button)
+        "Anulada" -> Color.Red
+        "Cuota fija" -> colorResource(R.color.green_button)
+        "Pendiente de pago" -> Color.Red
+        "Plan de pago" -> colorResource(R.color.green_button)
+        else -> Color.White
+    }
 }
 
 @Composable

@@ -11,7 +11,7 @@ fun String.toFormattedDisplayDateOrNull(): String? {
         val inputFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
         val localDate = LocalDate.parse(this, inputFormatter)
 
-        val outputFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale("es"))
+        val outputFormatter = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.getDefault())
         val formatted = localDate.format(outputFormatter)
 
         val parts = formatted.split(" ")

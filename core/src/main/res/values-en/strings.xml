@@ -31,4 +31,13 @@
     <string name="smartSolar_details_type_title">Auto consumption type</string>
     <string name="smartSolar_details_compensation_field_title">Compensation for excess</string>
     <string name="smartSolar_details_power_field_title">Installation power</string>
+    <string name="factura_descState_pagada">Paid</string>
+    <string name="factura_descState_anulada">Cancelled</string>
+    <string name="factura_descState_cuota_fija">Fixed fee</string>
+    <string name="factura_descState_pendiente_de_pago">Pending payment</string>
+    <string name="factura_descState_plan_de_pago">Payment plan</string>
+    <string name="smartSolar_installation_tab_title">My installation</string>
+    <string name="smartSolar_energy_tab_title">Energy</string>
+    <string name="smartSolar_details_tab_title">Details</string>
+    <string name="smartSolar_installation_autoconsumption_text">"Autoconsumption: "</string>
 </resources>

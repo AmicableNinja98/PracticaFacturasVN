@@ -46,12 +46,13 @@ fun InstallationScreen() {
         )
         Text(text = buildAnnotatedString {
             withStyle(style = SpanStyle(color = colorResource(R.color.gray_text))) {
-                append("Autoconsumo: ")
+                append(stringResource(R.string.smartSolar_installation_autoconsumption_text))
             }
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append("92%") }
         })
         Box(
             modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
         ) {
             Image(
                 painter = painterResource(R.drawable.grafico1),
