@@ -18,6 +18,8 @@ data class FacturaApi(
     val descEstado : String,
     @SerialName(value = "importeOrdenacion")
     val importeOrdenacion : Double,
+    @SerialName(value = "energiaConsumida")
+    val energiaConsumida : Int,
     @SerialName(value = "fecha")
     val fecha : String
 )

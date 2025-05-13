@@ -19,11 +19,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.R
 import com.example.core.extensions.toFormattedDisplayDateOrNull
+import com.example.core.extensions.toMillis
 import com.example.core.ui.screens.facturas.usecase.list.FacturaListState
 import com.example.core.ui.screens.facturas.usecase.list.FacturaListViewModel
 import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
@@ -45,6 +50,27 @@ import com.example.ui.base.composables.NoDataScreen
 import com.example.ui.base.composables.appbar.AppBarActions
 import com.example.ui.base.composables.appbar.BaseTopAppBar
 import com.example.ui.base.composables.appbar.BaseTopAppBarState
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.common.fill
+import com.patrykandpatrick.vico.compose.common.vicoTheme
+import com.patrykandpatrick.vico.core.cartesian.CartesianMeasuringContext
+import com.patrykandpatrick.vico.core.cartesian.axis.Axis
+import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
+import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 data class FacturaListEvents(
     val goToFilter: () -> Unit,
@@ -93,6 +119,8 @@ fun FacturaListScreenHost(
 
 @Composable
 fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
+    var columnChartSelected by remember { mutableStateOf(false) }
+    var dataMap: Map<Double, Number> = mapOf()
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -108,10 +136,119 @@ fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
                 modifier = Modifier.padding(bottom = 12.dp)
             )
         }
+        item {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text("€")
+                    Switch(
+                        checked = columnChartSelected,
+                        onCheckedChange = {
+                            columnChartSelected = it
+                        },
+                        colors = SwitchColors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = Color.LightGray,
+                            checkedBorderColor = Color.Black,
+                            checkedIconColor = Color.LightGray,
+                            uncheckedThumbColor = Color.White,
+                            uncheckedTrackColor = colorResource(R.color.green_button),
+                            uncheckedBorderColor = Color.Black,
+                            uncheckedIconColor = Color.Black,
+                            disabledCheckedThumbColor = Color.Black,
+                            disabledCheckedTrackColor = Color.Black,
+                            disabledCheckedBorderColor = Color.Black,
+                            disabledCheckedIconColor = Color.Black,
+                            disabledUncheckedThumbColor = Color.Black,
+                            disabledUncheckedTrackColor = Color.Black,
+                            disabledUncheckedBorderColor = Color.Black,
+                            disabledUncheckedIconColor = Color.Black
+                        )
+                    )
+                    Text("khW")
+                }
+
+                when (columnChartSelected) {
+                    true -> {
+                        dataMap = facturas.associate {
+                            ((it.fecha.toMillis() ?: 0).toDouble()) to it.energiaConsumida
+                        }
+                        FacturaChart(dataMap, columnChartSelected)
+                    }
+
+                    false -> {
+                        dataMap = facturas.associate {
+                            ((it.fecha.toMillis() ?: 0).toDouble()) to it.importeOrdenacion
+                        }
+                        FacturaChart(dataMap, columnChartSelected)
+                    }
+                }
+
+            }
+        }
         items(facturas) { factura ->
             FacturaItem(factura)
         }
     }
+}
+
+
+@Composable
+fun FacturaChart(dataMap: Map<Double, Number>, columnChartSelected: Boolean) {
+    val modelProducer = remember { CartesianChartModelProducer() }
+    LaunchedEffect(Unit) {
+        modelProducer.runTransaction {
+            if (columnChartSelected)
+                columnSeries {
+                    series(x = dataMap.keys, y = dataMap.values)
+                }
+            else
+                lineSeries {
+                    series(x = dataMap.keys, y = dataMap.values)
+                }
+        }
+    }
+
+    val bottomAxisValueFormatter = object : CartesianValueFormatter {
+        override fun format(
+            context: CartesianMeasuringContext,
+            value: Double,
+            verticalAxisPosition: Axis.Position.Vertical?
+        ): CharSequence {
+            val date = Date(value.toLong())
+            return SimpleDateFormat("d MMM yyyy", Locale.getDefault()).format(date)
+        }
+    }
+
+    CartesianChartHost(
+        chart =
+            rememberCartesianChart(
+                if (columnChartSelected) rememberColumnCartesianLayer()
+                else rememberLineCartesianLayer(
+                    lineProvider = LineCartesianLayer.LineProvider.series(
+                        vicoTheme.lineCartesianLayerColors.map { color ->
+                            LineCartesianLayer.rememberLine(
+                                LineCartesianLayer.LineFill.single(
+                                    fill(colorResource(R.color.green_button))
+                                ),
+                                pointConnector = LineCartesianLayer.PointConnector.cubic(1f),
+                            )
+                        }
+                    ),
+                ),
+                startAxis = VerticalAxis.rememberStart(),
+                bottomAxis = HorizontalAxis.rememberBottom(
+                    valueFormatter = bottomAxisValueFormatter,
+                    itemPlacer = HorizontalAxis.ItemPlacer.aligned(spacing = {30})
+                ),
+            ),
+        modelProducer = modelProducer
+    )
 }
 
 @Composable
@@ -187,8 +324,8 @@ fun FacturaItemPopUp(title: String, message: String, onDismiss: () -> Unit) {
 }
 
 @Composable
-private fun getFacturaStateText(factura: Factura) : String{
-    return when(factura.descEstado){
+private fun getFacturaStateText(factura: Factura): String {
+    return when (factura.descEstado) {
         "Pagada" -> stringResource(R.string.factura_descState_pagada)
         "Anulada" -> stringResource(R.string.factura_descState_anulada)
         "Cuota fija" -> stringResource(R.string.factura_descState_cuota_fija)
@@ -199,8 +336,8 @@ private fun getFacturaStateText(factura: Factura) : String{
 }
 
 @Composable
-private fun getFacturaStateColor(factura: Factura) : Color{
-    return when(factura.descEstado){
+private fun getFacturaStateColor(factura: Factura): Color {
+    return when (factura.descEstado) {
         "Pagada" -> colorResource(R.color.green_button)
         "Anulada" -> Color.Red
         "Cuota fija" -> colorResource(R.color.green_button)

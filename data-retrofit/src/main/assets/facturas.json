@@ -4,57 +4,68 @@
     {
       "descEstado": "Pendiente de pago",
       "importeOrdenacion": 1.5600000000000001,
-      "fecha": "07/02/2019"
+      "fecha": "07/02/2019",
+      "energiaConsumida": 10
     },
     {
       "descEstado": "Pagada",
       "importeOrdenacion": 25.1401,
-      "fecha": "05/02/2019"
+      "fecha": "05/02/2019",
+      "energiaConsumida": 168
     },
     {
       "descEstado": "Pagada",
       "importeOrdenacion": 22.6901,
-      "fecha": "08/01/2019"
+      "fecha": "08/01/2019",
+      "energiaConsumida": 151
     },
     {
       "descEstado": "Pendiente de pago",
       "importeOrdenacion": 12.84,
-      "fecha": "07/12/2018"
+      "fecha": "07/12/2018",
+      "energiaConsumida": 86
     },
     {
       "descEstado": "Pagada",
       "importeOrdenacion": 35.159,
-      "fecha": "16/11/2018"
+      "fecha": "16/11/2018",
+      "energiaConsumida": 234
     },
     {
       "descEstado": "Pagada",
       "importeOrdenacion": 18.27,
-      "fecha": "05/10/2018"
+      "fecha": "05/10/2018",
+      "energiaConsumida": 122
     },
     {
       "descEstado": "Pendiente de pago",
       "importeOrdenacion": 61.17,
-      "fecha": "05/09/2018"
+      "fecha": "05/09/2018",
+      "energiaConsumida": 408
     },
     {
       "descEstado": "Pagada",
       "importeOrdenacion": 37.18,
-      "fecha": "07/08/2018"
+      "fecha": "07/08/2018",
+      "energiaConsumida": 248
     },
     {
       "descEstado": "Anulada",
       "importeOrdenacion": 12.18,
-      "fecha": "17/08/2024"
+      "fecha": "17/08/2024",
+      "energiaConsumida": 81
     },
     {
       "descEstado": "Anulada",
       "importeOrdenacion": 234.18,
-      "fecha": "12/04/2025"
+      "fecha": "12/04/2025",
+      "energiaConsumida": 1561
     },
     {
       "descEstado": "Cuota fija",
       "importeOrdenacion": 120.18,
-      "fecha": "11/07/2025"
+      "fecha": "11/07/2025",
+      "energiaConsumida": 801
     }
   ]
 }
