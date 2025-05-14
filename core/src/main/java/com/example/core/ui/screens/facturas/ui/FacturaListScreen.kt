@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -18,15 +21,21 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,6 +54,14 @@ import com.example.ui.base.composables.NoDataScreen
 import com.example.ui.base.composables.appbar.AppBarActions
 import com.example.ui.base.composables.appbar.BaseTopAppBar
 import com.example.ui.base.composables.appbar.BaseTopAppBarState
+import ir.ehsannarmani.compose_charts.ColumnChart
+import ir.ehsannarmani.compose_charts.LineChart
+import ir.ehsannarmani.compose_charts.models.BarProperties
+import ir.ehsannarmani.compose_charts.models.Bars
+import ir.ehsannarmani.compose_charts.models.DotProperties
+import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
+import ir.ehsannarmani.compose_charts.models.LabelProperties
+import ir.ehsannarmani.compose_charts.models.Line
 
 data class FacturaListEvents(
     val goToFilter: () -> Unit,
@@ -93,6 +110,8 @@ fun FacturaListScreenHost(
 
 @Composable
 fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
+    var columnChartSelected by remember { mutableStateOf(false) }
+    var dataMap: Map<String, Number> = mapOf()
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -108,10 +127,148 @@ fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
                 modifier = Modifier.padding(bottom = 12.dp)
             )
         }
+
+        item {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Text("€")
+                    Switch(
+                        checked = columnChartSelected,
+                        onCheckedChange = {
+                            columnChartSelected = it
+                        },
+                        colors = SwitchColors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = Color.LightGray,
+                            checkedBorderColor = Color.Black,
+                            checkedIconColor = Color.LightGray,
+                            uncheckedThumbColor = Color.White,
+                            uncheckedTrackColor = colorResource(R.color.green_button),
+                            uncheckedBorderColor = Color.Black,
+                            uncheckedIconColor = Color.Black,
+                            disabledCheckedThumbColor = Color.Black,
+                            disabledCheckedTrackColor = Color.Black,
+                            disabledCheckedBorderColor = Color.Black,
+                            disabledCheckedIconColor = Color.Black,
+                            disabledUncheckedThumbColor = Color.Black,
+                            disabledUncheckedTrackColor = Color.Black,
+                            disabledUncheckedBorderColor = Color.Black,
+                            disabledUncheckedIconColor = Color.Black
+                        )
+                    )
+                    Text("khW")
+                }
+            }
+        }
+
+        item {
+            LazyRow {
+                item {
+                    dataMap = when (columnChartSelected) {
+                        true -> {
+                            facturas.associate {
+                                (it.fecha.toFormattedDisplayDateOrNull() ?: "") to it.energiaConsumida
+                            }
+
+                        }
+
+                        false -> {
+                            facturas.associate {
+                                (it.fecha.toFormattedDisplayDateOrNull() ?: "") to it.importeOrdenacion
+                            }
+                        }
+                    }
+                    FacturaChartHost(dataMap, columnChartSelected)
+                }
+            }
+        }
         items(facturas) { factura ->
             FacturaItem(factura)
         }
     }
+}
+
+
+@Composable
+fun FacturaChartHost(dataMap: Map<String, Number>, columnChartSelected: Boolean) {
+    val indicatorProperties = HorizontalIndicatorProperties(
+        enabled = true,
+        padding = 10.dp,
+        textStyle = MaterialTheme.typography.labelSmall)
+
+        val labelProperties = LabelProperties(
+            enabled = true,
+            labels = dataMap.keys.toList(),
+            //padding = 20.dp
+        )
+
+    if(columnChartSelected){
+        FacturaColumnChart(dataMap,indicatorProperties,labelProperties)
+    }
+    else{
+        FacturaLineChart(dataMap,indicatorProperties,labelProperties)
+    }
+}
+
+@Composable
+fun FacturaLineChart(dataMap: Map<String, Number>,indicatorProperties: HorizontalIndicatorProperties,labelProperties: LabelProperties){
+    LineChart(
+        modifier = Modifier
+            .widthIn(min = 600.dp, max = 900.dp)
+            .heightIn(min = 400.dp, max = 600.dp)
+            .padding(vertical = 10.dp),
+        data = remember {
+            listOf(Line(
+                label = "Euros",
+                values = dataMap.values.map { it.toDouble() },
+                color = SolidColor(Color.Green)
+            ))
+        },
+        indicatorProperties = indicatorProperties,
+        labelProperties = labelProperties,
+        dotsProperties = DotProperties(
+            enabled = true,
+            color = SolidColor(Color.Green),
+            radius = 4.dp
+        )
+    )
+}
+
+@Composable
+fun FacturaColumnChart(dataMap: Map<String, Number>,indicatorProperties: HorizontalIndicatorProperties,labelProperties: LabelProperties){
+    ColumnChart(
+        modifier = Modifier
+            .widthIn(min = 600.dp, max = 900.dp)
+            .heightIn(min = 400.dp, max = 600.dp)
+            .padding(vertical = 10.dp),
+        data = remember {
+            dataMap.keys.map {
+                Bars(
+                    label = it,
+                    values = listOf(
+                        Bars.Data(
+                            label = "KwH",
+                            value = (dataMap[it] ?: 0).toDouble(),
+                            color = SolidColor(Color.Green)
+                        )
+                    )
+                )
+            }
+        },
+        indicatorProperties = indicatorProperties,
+        labelProperties = labelProperties,
+        barProperties = BarProperties(
+            cornerRadius = Bars.Data.Radius.Rectangle(topRight = 6.dp, topLeft = 6.dp),
+            spacing = 3.dp,
+            thickness = 20.dp
+        ),
+    )
 }
 
 @Composable
@@ -125,8 +282,7 @@ fun FacturaItem(factura: Factura) {
             .clickable(
                 onClick = {
                     openDialog.value = true
-                }
-            ),
+                }),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.Top
     ) {
@@ -187,8 +343,8 @@ fun FacturaItemPopUp(title: String, message: String, onDismiss: () -> Unit) {
 }
 
 @Composable
-private fun getFacturaStateText(factura: Factura) : String{
-    return when(factura.descEstado){
+private fun getFacturaStateText(factura: Factura): String {
+    return when (factura.descEstado) {
         "Pagada" -> stringResource(R.string.factura_descState_pagada)
         "Anulada" -> stringResource(R.string.factura_descState_anulada)
         "Cuota fija" -> stringResource(R.string.factura_descState_cuota_fija)
@@ -199,8 +355,8 @@ private fun getFacturaStateText(factura: Factura) : String{
 }
 
 @Composable
-private fun getFacturaStateColor(factura: Factura) : Color{
-    return when(factura.descEstado){
+private fun getFacturaStateColor(factura: Factura): Color {
+    return when (factura.descEstado) {
         "Pagada" -> colorResource(R.color.green_button)
         "Anulada" -> Color.Red
         "Cuota fija" -> colorResource(R.color.green_button)

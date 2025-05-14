@@ -64,6 +64,8 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     implementation (libs.hilt.navigation.compose)
 
+    implementation("io.github.ehsannarmani:compose-charts:0.1.0")
+
     testImplementation(libs.junit)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlinx.coroutines.test)

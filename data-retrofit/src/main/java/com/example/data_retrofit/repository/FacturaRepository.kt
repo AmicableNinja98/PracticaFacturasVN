@@ -38,7 +38,8 @@ class FacturaRepository @Inject constructor(
             Factura(
                 descEstado = facturaApi.descEstado,
                 importeOrdenacion = facturaApi.importeOrdenacion,
-                fecha = facturaApi.fecha
+                fecha = facturaApi.fecha,
+                energiaConsumida = facturaApi.energiaConsumida
             )
         )
     }
