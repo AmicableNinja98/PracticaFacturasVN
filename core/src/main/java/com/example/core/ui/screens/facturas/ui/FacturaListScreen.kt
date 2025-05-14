@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -18,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
@@ -31,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.R
 import com.example.core.extensions.toFormattedDisplayDateOrNull
-import com.example.core.extensions.toMillis
 import com.example.core.ui.screens.facturas.usecase.list.FacturaListState
 import com.example.core.ui.screens.facturas.usecase.list.FacturaListViewModel
 import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
@@ -50,27 +54,14 @@ import com.example.ui.base.composables.NoDataScreen
 import com.example.ui.base.composables.appbar.AppBarActions
 import com.example.ui.base.composables.appbar.BaseTopAppBar
 import com.example.ui.base.composables.appbar.BaseTopAppBarState
-import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
-import com.patrykandpatrick.vico.compose.common.fill
-import com.patrykandpatrick.vico.compose.common.vicoTheme
-import com.patrykandpatrick.vico.core.cartesian.CartesianMeasuringContext
-import com.patrykandpatrick.vico.core.cartesian.axis.Axis
-import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
-import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
-import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
-import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import ir.ehsannarmani.compose_charts.ColumnChart
+import ir.ehsannarmani.compose_charts.LineChart
+import ir.ehsannarmani.compose_charts.models.BarProperties
+import ir.ehsannarmani.compose_charts.models.Bars
+import ir.ehsannarmani.compose_charts.models.DotProperties
+import ir.ehsannarmani.compose_charts.models.HorizontalIndicatorProperties
+import ir.ehsannarmani.compose_charts.models.LabelProperties
+import ir.ehsannarmani.compose_charts.models.Line
 
 data class FacturaListEvents(
     val goToFilter: () -> Unit,
@@ -120,7 +111,7 @@ fun FacturaListScreenHost(
 @Composable
 fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
     var columnChartSelected by remember { mutableStateOf(false) }
-    var dataMap: Map<Double, Number> = mapOf()
+    var dataMap: Map<String, Number> = mapOf()
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -136,10 +127,11 @@ fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
                 modifier = Modifier.padding(bottom = 12.dp)
             )
         }
+
         item {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -172,23 +164,28 @@ fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
                     )
                     Text("khW")
                 }
+            }
+        }
 
-                when (columnChartSelected) {
-                    true -> {
-                        dataMap = facturas.associate {
-                            ((it.fecha.toMillis() ?: 0).toDouble()) to it.energiaConsumida
-                        }
-                        FacturaChart(dataMap, columnChartSelected)
-                    }
+        item {
+            LazyRow {
+                item {
+                    dataMap = when (columnChartSelected) {
+                        true -> {
+                            facturas.associate {
+                                (it.fecha.toFormattedDisplayDateOrNull() ?: "") to it.energiaConsumida
+                            }
 
-                    false -> {
-                        dataMap = facturas.associate {
-                            ((it.fecha.toMillis() ?: 0).toDouble()) to it.importeOrdenacion
                         }
-                        FacturaChart(dataMap, columnChartSelected)
+
+                        false -> {
+                            facturas.associate {
+                                (it.fecha.toFormattedDisplayDateOrNull() ?: "") to it.importeOrdenacion
+                            }
+                        }
                     }
+                    FacturaChartHost(dataMap, columnChartSelected)
                 }
-
             }
         }
         items(facturas) { factura ->
@@ -199,55 +196,78 @@ fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
 
 
 @Composable
-fun FacturaChart(dataMap: Map<Double, Number>, columnChartSelected: Boolean) {
-    val modelProducer = remember { CartesianChartModelProducer() }
-    LaunchedEffect(Unit) {
-        modelProducer.runTransaction {
-            if (columnChartSelected)
-                columnSeries {
-                    series(x = dataMap.keys, y = dataMap.values)
-                }
-            else
-                lineSeries {
-                    series(x = dataMap.keys, y = dataMap.values)
-                }
-        }
-    }
+fun FacturaChartHost(dataMap: Map<String, Number>, columnChartSelected: Boolean) {
+    val indicatorProperties = HorizontalIndicatorProperties(
+        enabled = true,
+        padding = 10.dp,
+        textStyle = MaterialTheme.typography.labelSmall)
 
-    val bottomAxisValueFormatter = object : CartesianValueFormatter {
-        override fun format(
-            context: CartesianMeasuringContext,
-            value: Double,
-            verticalAxisPosition: Axis.Position.Vertical?
-        ): CharSequence {
-            val date = Date(value.toLong())
-            return SimpleDateFormat("d MMM yyyy", Locale.getDefault()).format(date)
-        }
-    }
+        val labelProperties = LabelProperties(
+            enabled = true,
+            labels = dataMap.keys.toList(),
+            //padding = 20.dp
+        )
 
-    CartesianChartHost(
-        chart =
-            rememberCartesianChart(
-                if (columnChartSelected) rememberColumnCartesianLayer()
-                else rememberLineCartesianLayer(
-                    lineProvider = LineCartesianLayer.LineProvider.series(
-                        vicoTheme.lineCartesianLayerColors.map { color ->
-                            LineCartesianLayer.rememberLine(
-                                LineCartesianLayer.LineFill.single(
-                                    fill(colorResource(R.color.green_button))
-                                ),
-                                pointConnector = LineCartesianLayer.PointConnector.cubic(1f),
-                            )
-                        }
-                    ),
-                ),
-                startAxis = VerticalAxis.rememberStart(),
-                bottomAxis = HorizontalAxis.rememberBottom(
-                    valueFormatter = bottomAxisValueFormatter,
-                    itemPlacer = HorizontalAxis.ItemPlacer.aligned(spacing = {30})
-                ),
-            ),
-        modelProducer = modelProducer
+    if(columnChartSelected){
+        FacturaColumnChart(dataMap,indicatorProperties,labelProperties)
+    }
+    else{
+        FacturaLineChart(dataMap,indicatorProperties,labelProperties)
+    }
+}
+
+@Composable
+fun FacturaLineChart(dataMap: Map<String, Number>,indicatorProperties: HorizontalIndicatorProperties,labelProperties: LabelProperties){
+    LineChart(
+        modifier = Modifier
+            .widthIn(min = 600.dp, max = 900.dp)
+            .heightIn(min = 400.dp, max = 600.dp)
+            .padding(vertical = 10.dp),
+        data = remember {
+            listOf(Line(
+                label = "Euros",
+                values = dataMap.values.map { it.toDouble() },
+                color = SolidColor(Color.Green)
+            ))
+        },
+        indicatorProperties = indicatorProperties,
+        labelProperties = labelProperties,
+        dotsProperties = DotProperties(
+            enabled = true,
+            color = SolidColor(Color.Green),
+            radius = 4.dp
+        )
+    )
+}
+
+@Composable
+fun FacturaColumnChart(dataMap: Map<String, Number>,indicatorProperties: HorizontalIndicatorProperties,labelProperties: LabelProperties){
+    ColumnChart(
+        modifier = Modifier
+            .widthIn(min = 600.dp, max = 900.dp)
+            .heightIn(min = 400.dp, max = 600.dp)
+            .padding(vertical = 10.dp),
+        data = remember {
+            dataMap.keys.map {
+                Bars(
+                    label = it,
+                    values = listOf(
+                        Bars.Data(
+                            label = "KwH",
+                            value = (dataMap[it] ?: 0).toDouble(),
+                            color = SolidColor(Color.Green)
+                        )
+                    )
+                )
+            }
+        },
+        indicatorProperties = indicatorProperties,
+        labelProperties = labelProperties,
+        barProperties = BarProperties(
+            cornerRadius = Bars.Data.Radius.Rectangle(topRight = 6.dp, topLeft = 6.dp),
+            spacing = 3.dp,
+            thickness = 20.dp
+        ),
     )
 }
 
@@ -262,8 +282,7 @@ fun FacturaItem(factura: Factura) {
             .clickable(
                 onClick = {
                     openDialog.value = true
-                }
-            ),
+                }),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.Top
     ) {

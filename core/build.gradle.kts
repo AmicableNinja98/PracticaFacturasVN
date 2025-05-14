@@ -64,8 +64,7 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     implementation (libs.hilt.navigation.compose)
 
-    //Vico (gráficos y tablas)
-    implementation(libs.vico.compose.m3)
+    implementation("io.github.ehsannarmani:compose-charts:0.1.0")
 
     testImplementation(libs.junit)
     testImplementation(libs.mockito.kotlin)
