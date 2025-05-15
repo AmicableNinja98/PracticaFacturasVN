@@ -392,9 +392,9 @@ fun ImporteSlider(
             valueRange = sliderRange,
             steps = 0,
             colors = SliderColors(
-                thumbColor = colorResource(id = R.color.green_button),
-                activeTrackColor = colorResource(id = R.color.green_button),
-                activeTickColor = colorResource(id = R.color.green_button),
+                thumbColor = colorResource(id = R.color.light_orange),
+                activeTrackColor = colorResource(id = R.color.light_orange),
+                activeTickColor = colorResource(id = R.color.light_orange),
                 inactiveTrackColor = Color.LightGray,
                 inactiveTickColor = Color.LightGray,
                 disabledThumbColor = Color.LightGray,
