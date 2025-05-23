@@ -77,6 +77,7 @@ fun SmartSolarScreen(smartSolarScreenViewModel: SmartSolarScreenViewModel,goBack
             }
             HorizontalPager(
                 state = pagerState,
+                userScrollEnabled = false,
                 modifier = Modifier.weight(1f)
             ) {
                 when (tabIndex) {
