@@ -99,7 +99,8 @@ fun FacturaListScreenHost(
             )
 
             is FacturaListState.Success -> FacturaListScreen(
-                (facturaListViewModel.state as FacturaListState.Success).facturas,
+                facturas = (facturaListViewModel.state as FacturaListState.Success).facturas,
+                showChart = facturaListViewModel.showGraph,
                 modifier = Modifier.padding(innerPadding)
             )
 
@@ -109,9 +110,10 @@ fun FacturaListScreenHost(
 }
 
 @Composable
-fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
+fun FacturaListScreen(facturas: List<Factura>,showChart : Boolean ,modifier: Modifier) {
     var columnChartSelected by remember { mutableStateOf(false) }
     var dataMap: Map<String, Number> = mapOf()
+
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
@@ -128,63 +130,65 @@ fun FacturaListScreen(facturas: List<Factura>, modifier: Modifier) {
             )
         }
 
-        item {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+        if(showChart){
+            item {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text("€")
-                    Switch(
-                        checked = columnChartSelected,
-                        onCheckedChange = {
-                            columnChartSelected = it
-                        },
-                        colors = SwitchColors(
-                            checkedThumbColor = Color.White,
-                            checkedTrackColor = Color.LightGray,
-                            checkedBorderColor = Color.Black,
-                            checkedIconColor = Color.LightGray,
-                            uncheckedThumbColor = Color.White,
-                            uncheckedTrackColor = colorResource(R.color.green_button),
-                            uncheckedBorderColor = Color.Black,
-                            uncheckedIconColor = Color.Black,
-                            disabledCheckedThumbColor = Color.Black,
-                            disabledCheckedTrackColor = Color.Black,
-                            disabledCheckedBorderColor = Color.Black,
-                            disabledCheckedIconColor = Color.Black,
-                            disabledUncheckedThumbColor = Color.Black,
-                            disabledUncheckedTrackColor = Color.Black,
-                            disabledUncheckedBorderColor = Color.Black,
-                            disabledUncheckedIconColor = Color.Black
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Text("€")
+                        Switch(
+                            checked = columnChartSelected,
+                            onCheckedChange = {
+                                columnChartSelected = it
+                            },
+                            colors = SwitchColors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = Color.LightGray,
+                                checkedBorderColor = Color.Black,
+                                checkedIconColor = Color.LightGray,
+                                uncheckedThumbColor = Color.White,
+                                uncheckedTrackColor = colorResource(R.color.green_button),
+                                uncheckedBorderColor = Color.Black,
+                                uncheckedIconColor = Color.Black,
+                                disabledCheckedThumbColor = Color.Black,
+                                disabledCheckedTrackColor = Color.Black,
+                                disabledCheckedBorderColor = Color.Black,
+                                disabledCheckedIconColor = Color.Black,
+                                disabledUncheckedThumbColor = Color.Black,
+                                disabledUncheckedTrackColor = Color.Black,
+                                disabledUncheckedBorderColor = Color.Black,
+                                disabledUncheckedIconColor = Color.Black
+                            )
                         )
-                    )
-                    Text("khW")
+                        Text("khW")
+                    }
                 }
             }
-        }
 
-        item {
-            LazyRow {
-                item {
-                    dataMap = when (columnChartSelected) {
-                        true -> {
-                            facturas.associate {
-                                (it.fecha.toFormattedDisplayDateOrNull() ?: "") to it.energiaConsumida
+            item {
+                LazyRow {
+                    item {
+                        dataMap = when (columnChartSelected) {
+                            true -> {
+                                facturas.associate {
+                                    (it.fecha.toFormattedDisplayDateOrNull() ?: "") to it.energiaConsumida
+                                }
+
                             }
 
-                        }
-
-                        false -> {
-                            facturas.associate {
-                                (it.fecha.toFormattedDisplayDateOrNull() ?: "") to it.importeOrdenacion
+                            false -> {
+                                facturas.associate {
+                                    (it.fecha.toFormattedDisplayDateOrNull() ?: "") to it.importeOrdenacion
+                                }
                             }
                         }
+                        FacturaChartHost(dataMap, columnChartSelected)
                     }
-                    FacturaChartHost(dataMap, columnChartSelected)
                 }
             }
         }

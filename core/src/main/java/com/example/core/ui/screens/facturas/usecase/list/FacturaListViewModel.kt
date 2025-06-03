@@ -1,11 +1,12 @@
 package com.example.core.ui.screens.facturas.usecase.list
 
-import androidx.annotation.VisibleForTesting
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.core.firebase.RemoteConfigManager
 import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
 import com.example.data_retrofit.repository.FacturaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,8 +19,18 @@ class FacturaListViewModel @Inject constructor(private val facturaRepository: Fa
     var state by mutableStateOf<FacturaListState>(FacturaListState.Loading)
         private set
 
+    var showGraph by mutableStateOf(false)
+        private set
+
     init {
-        resetData()
+        viewModelScope.launch {
+            resetData()
+            val success = RemoteConfigManager.fetchAndActivate()
+            Log.d("RemoteConfig", "Fetch success: $success")
+            val value = RemoteConfigManager.getShowGraph()
+            Log.d("RemoteConfig", "Show graph: $value")
+            showGraph = value
+        }
     }
 
     private fun resetData(){
