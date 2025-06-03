@@ -5,7 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
     alias(libs.plugins.hilt.application)
     id("com.google.gms.google-services")
-
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -87,6 +87,7 @@ dependencies {
     // When using the BoM, don't specify versions in Firebase dependencies
     implementation("com.google.firebase:firebase-config")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
 
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries

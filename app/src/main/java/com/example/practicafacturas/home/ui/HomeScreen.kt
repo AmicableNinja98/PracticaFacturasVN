@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -141,6 +142,13 @@ fun HomeScreenBody(
                 disabledUncheckedIconColor = Color.Black
             )
         )
+        Button(
+            onClick = {
+                throw RuntimeException("Crash de prueba")
+            }
+        ) {
+            Text("Kaboom")
+        }
     }
 }
 
