@@ -7,4 +7,5 @@
     <string name="switch_useMockData_negativeText">Use Mock data: No</string>
     <string name="snackbar_usingMock_message">Using data from Mock</string>
     <string name="snackbar_usingApi_message">Using data from Api</string>
+    <string name="crash_button_text">Kaboom</string>
 </resources>

@@ -12,11 +12,11 @@ import androidx.compose.ui.res.stringResource
 import com.example.ui.R
 
 @Composable
-fun NoDataScreen(modifier: Modifier = Modifier){
+fun NoDataScreen(text : String?,modifier: Modifier = Modifier){
     Box(
         modifier = modifier.fillMaxSize().background(color = Color.White),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = stringResource(R.string.no_data_screen_text))
+        Text(text = text ?: stringResource(R.string.no_data_screen_text))
     }
 }

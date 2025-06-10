@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -26,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.example.core.R
 import com.example.core.ui.screens.smartSolar.usecase.SmartSolarScreenState
 import com.example.core.ui.screens.smartSolar.usecase.SmartSolarScreenViewModel
+import com.example.domain.appstrings.AppStrings
 import com.example.domain.use_details.UseDetails
 import com.example.ui.base.composables.BaseAlertDialog
 import com.example.ui.base.composables.BaseReadOnlyTextField
@@ -33,7 +36,7 @@ import com.example.ui.base.composables.LoadingScreen
 import com.example.ui.base.composables.NoDataScreen
 
 @Composable
-fun InstallationScreen() {
+fun InstallationScreen(strings : State<AppStrings?>) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -41,14 +44,14 @@ fun InstallationScreen() {
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Text(
-            text = stringResource(R.string.smartSolar_installation_title),
+            text = strings.value?.smartSolarInstallationTitle ?: stringResource(R.string.smartSolar_installation_title),
             modifier = Modifier.padding(bottom = 28.dp)
         )
         Text(text = buildAnnotatedString {
             withStyle(style = SpanStyle(color = colorResource(R.color.gray_text))) {
-                append(stringResource(R.string.smartSolar_installation_autoconsumption_text))
+                append(strings.value?.smartSolarInstallationAutoconsumptionText ?: stringResource(R.string.smartSolar_installation_autoconsumption_text))
             }
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append("92%") }
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) { append(" 92%") }
         })
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -64,7 +67,7 @@ fun InstallationScreen() {
 }
 
 @Composable
-fun EnergyScreen() {
+fun EnergyScreen(strings : State<AppStrings?>) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -84,7 +87,7 @@ fun EnergyScreen() {
             contentAlignment = Alignment.BottomStart
         ) {
             Text(
-                text = stringResource(R.string.smartSolar_energy_screen_text)
+                text = strings.value?.smartSolarEnergyScreenText ?: stringResource(R.string.smartSolar_energy_screen_text)
             )
         }
     }
@@ -95,15 +98,17 @@ fun DetailsScreenHost(smartSolarScreenViewModel: SmartSolarScreenViewModel) {
     LaunchedEffect(Unit) {
         smartSolarScreenViewModel.loadMockDetails()
     }
+    val strings = smartSolarScreenViewModel.strings.collectAsState()
+
     when(smartSolarScreenViewModel.state){
-        is SmartSolarScreenState.Loading -> LoadingScreen(stringResource(R.string.smartSolar_details_loading_text))
-        is SmartSolarScreenState.Success -> DetailsScreen((smartSolarScreenViewModel.state as SmartSolarScreenState.Success).details)
-        is SmartSolarScreenState.NoData -> NoDataScreen()
+        is SmartSolarScreenState.Loading -> LoadingScreen(strings.value?.smartSolarDetailsLoadingText ?: stringResource(R.string.smartSolar_details_loading_text))
+        is SmartSolarScreenState.Success -> DetailsScreen((smartSolarScreenViewModel.state as SmartSolarScreenState.Success).details, strings = strings)
+        is SmartSolarScreenState.NoData -> NoDataScreen(text = strings.value?.noDataScreenText)
     }
 }
 
 @Composable
-fun DetailsScreen(details: UseDetails){
+fun DetailsScreen(details: UseDetails,strings : State<AppStrings?>){
     val openDialog = remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
@@ -112,11 +117,11 @@ fun DetailsScreen(details: UseDetails){
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         BaseReadOnlyTextField(
-            title = stringResource(R.string.smartSolar_details_code_field_title),
+            title = strings.value?.smartSolarDetailsCodeFieldTitle ?: stringResource(R.string.smartSolar_details_code_field_title),
             input = details.codigo
         )
         BaseReadOnlyTextField(
-            title = stringResource(R.string.smartSolar_details_request_status_title),
+            title = strings.value?.smartSolarDetailsRequestStatusTitle ?: stringResource(R.string.smartSolar_details_request_status_title),
             input = details.estado,
             iconRequired = true,
             onIconClick = {
@@ -124,22 +129,22 @@ fun DetailsScreen(details: UseDetails){
             }
         )
         BaseReadOnlyTextField(
-            title = stringResource(R.string.smartSolar_details_type_title),
+            title = strings.value?.smartSolarDetailsTypeTitle ?: stringResource(R.string.smartSolar_details_type_title),
             input = details.tipo
         )
         BaseReadOnlyTextField(
-            title = stringResource(R.string.smartSolar_details_compensation_field_title),
+            title = strings.value?.smartSolarDetailsCompensationFieldTitle ?: stringResource(R.string.smartSolar_details_compensation_field_title),
             input = details.compensacion
         )
         BaseReadOnlyTextField(
-            title = stringResource(R.string.smartSolar_details_power_field_title),
+            title = strings.value?.smartSolarDetailsPowerFieldTitle ?: stringResource(R.string.smartSolar_details_power_field_title),
             input = details.potencia
         )
         if(openDialog.value){
             BaseAlertDialog(
-                title = stringResource(R.string.smartSolar_dialog_title),
-                message = stringResource(R.string.smartSolar_dialog_message),
-                closeButtonText = stringResource(R.string.smartSolar_dialog_button_text),
+                title = strings.value?.smartSolarDialogTitle ?: stringResource(R.string.smartSolar_dialog_title),
+                message = strings.value?.smartSolarDialogMessage ?: stringResource(R.string.smartSolar_dialog_message),
+                closeButtonText = strings.value?.smartSolarDialogButtonText ?: stringResource(R.string.smartSolar_dialog_button_text),
                 onDismiss = {
                     openDialog.value = false
                 }

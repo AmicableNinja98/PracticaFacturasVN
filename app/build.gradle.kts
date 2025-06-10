@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
     alias(libs.plugins.hilt.application)
+    id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -77,9 +79,25 @@ dependencies {
     //Retromock
     implementation (libs.retromock)
 
+    //Firebase
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
+
+    // When using the BoM, don't specify versions in Firebase dependencies
+    implementation("com.google.firebase:firebase-config")
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-crashlytics")
+    implementation ("com.google.firebase:firebase-firestore-ktx")
+
+    // Add the dependencies for any other desired Firebase products
+    // https://firebase.google.com/docs/android/setup#available-libraries
+
+
     implementation(project(":core"))
     implementation(project(":data-retrofit"))
     implementation(project(":domain"))
+    implementation(project(":base_ui"))
 
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)

@@ -9,6 +9,9 @@ import com.example.data_retrofit.services.FacturaApiService
 import com.example.data_retrofit.services.MockApi
 import com.example.data_retrofit.services.RealApi
 import com.example.data_retrofit.services.SmartSolarService
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -87,4 +90,8 @@ object AppModule {
     @Singleton
     fun provideFacturaDao(facturaDatabase: FacturaDatabase): FacturaDao =
         facturaDatabase.getFacturaDao()
+
+    @Provides
+    @Singleton
+    fun provideFirebaseFirestoreInstance() : FirebaseFirestore = Firebase.firestore
 }

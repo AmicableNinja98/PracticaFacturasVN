@@ -39,5 +39,6 @@
     <string name="smartSolar_installation_tab_title">My installation</string>
     <string name="smartSolar_energy_tab_title">Energy</string>
     <string name="smartSolar_details_tab_title">Details</string>
-    <string name="smartSolar_installation_autoconsumption_text">"Autoconsumption: "</string>
+    <string name="smartSolar_installation_autoconsumption_text">"Autoconsumption:"</string>
+    <string name="euros_Chart_Label">Euros</string>
 </resources>

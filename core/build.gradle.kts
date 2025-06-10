@@ -64,6 +64,18 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     implementation (libs.hilt.navigation.compose)
 
+    //Firebase
+
+    // Import the Firebase BoM
+    implementation(platform("com.google.firebase:firebase-bom:33.14.0"))
+
+    // When using the BoM, don't specify versions in Firebase dependencies
+    implementation("com.google.firebase:firebase-config")
+    implementation("com.google.firebase:firebase-analytics")
+
+    // Add the dependencies for any other desired Firebase products
+    // https://firebase.google.com/docs/android/setup#available-libraries
+
     implementation("io.github.ehsannarmani:compose-charts:0.1.0")
 
     testImplementation(libs.junit)
