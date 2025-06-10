@@ -88,6 +88,7 @@ dependencies {
     implementation("com.google.firebase:firebase-config")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-crashlytics")
+    implementation ("com.google.firebase:firebase-firestore-ktx")
 
     // Add the dependencies for any other desired Firebase products
     // https://firebase.google.com/docs/android/setup#available-libraries
@@ -96,6 +97,7 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":data-retrofit"))
     implementation(project(":domain"))
+    implementation(project(":base_ui"))
 
     testImplementation(libs.junit)
     testImplementation(libs.junit.jupiter.api)

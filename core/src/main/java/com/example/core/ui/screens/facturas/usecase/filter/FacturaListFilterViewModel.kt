@@ -7,9 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.extensions.toLocalDateOrNull
 import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
+import com.example.data_retrofit.repository.AppStringsRepository
 import com.example.data_retrofit.repository.FacturaRepository
+import com.example.domain.appstrings.AppStrings
 import com.example.domain.factura.Factura
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -18,10 +21,21 @@ import javax.inject.Inject
 import kotlin.math.ceil
 
 @HiltViewModel
-class FacturaListFilterViewModel @Inject constructor(val facturaRepository: FacturaRepository) :
+class FacturaListFilterViewModel @Inject constructor(
+    val facturaRepository: FacturaRepository,
+    private val appStringsRepository: AppStringsRepository
+) :
     ViewModel() {
     var state by mutableStateOf<FacturaListFilterState>(FacturaListFilterState())
         private set
+
+    val strings = MutableStateFlow<AppStrings?>(null)
+
+    init {
+        viewModelScope.launch {
+            strings.value = appStringsRepository.getAppStrings()
+        }
+    }
 
     private lateinit var facturasOriginalBaseDeDatos: MutableList<Factura>
 
@@ -180,14 +194,14 @@ class FacturaListFilterViewModel @Inject constructor(val facturaRepository: Fact
     private fun getImporteMinFromFacturas(facturas: List<Factura>) =
         try {
             facturas.minOf { it.importeOrdenacion }
-        }catch (_ : NoSuchElementException){
+        } catch (_: NoSuchElementException) {
             0.0
         }
 
     private fun getImporteMaxFromFacturas(facturas: List<Factura>) =
         try {
             facturas.maxOf { it.importeOrdenacion }
-        }catch (_ : NoSuchElementException){
+        } catch (_: NoSuchElementException) {
             0.0
         }
 }

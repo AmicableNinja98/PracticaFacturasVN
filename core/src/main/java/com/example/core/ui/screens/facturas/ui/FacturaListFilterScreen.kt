@@ -31,6 +31,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -43,10 +45,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.core.R
+import com.example.core.extensions.getFacturaStateName
 import com.example.core.extensions.toMillis
 import com.example.core.ui.screens.facturas.usecase.filter.FacturaListFilterState
 import com.example.core.ui.screens.facturas.usecase.filter.FacturaListFilterViewModel
 import com.example.core.ui.screens.facturas.usecase.shared.FacturaSharedViewModel
+import com.example.domain.appstrings.AppStrings
 import com.example.ui.base.composables.BaseAlertDialog
 import com.example.ui.base.composables.BaseButton
 
@@ -57,6 +61,8 @@ fun FacturaListFilterHost(
     goBack: () -> Unit
 ) {
     val openDialog = remember { mutableStateOf(false) }
+    val strings = facturaListFilterViewModel.strings.collectAsState()
+
     LaunchedEffect(Unit) {
         facturaListFilterViewModel.getFacturas(facturaSharedViewModel)
     }
@@ -65,8 +71,8 @@ fun FacturaListFilterHost(
         openDialog.value = true
         if (openDialog.value) {
             NoDataFilterPopUp(
-                title = stringResource(R.string.filter_popUp_title),
-                message = stringResource(R.string.filter_popUp_message),
+                title = strings.value?.filterPopUpTitle ?: stringResource(R.string.filter_popUp_title),
+                message = strings.value?.filterPopUpMessage ?: stringResource(R.string.filter_popUp_message),
                 onDismiss = {
                     openDialog.value = false
                     facturaListFilterViewModel.onFiltersReset(facturaSharedViewModel)
@@ -85,12 +91,14 @@ fun FacturaListFilterScreen(
     facturaSharedViewModel: FacturaSharedViewModel,
     goBack: () -> Unit
 ) {
+    val strings = facturaListFilterViewModel.strings.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(R.string.filter_screen_title),
+                        text = strings.value?.filterScreenTitle ?: stringResource(R.string.filter_screen_title),
                         fontWeight = FontWeight.Bold,
                         fontSize = 40.sp,
                         modifier = Modifier.padding(top = 20.dp)
@@ -149,8 +157,10 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
     val datePickerFirstDateState = createRememberDatePickerState(state = facturaListFilterViewModel.state, isStartDate = true)
     val datePickerSecondDateState = createRememberDatePickerState(state = facturaListFilterViewModel.state)
 
+    val strings = facturaListFilterViewModel.strings.collectAsState()
+
     Text(
-        text = stringResource(R.string.filter_date_title),
+        text = strings.value?.filterDateTitle ?: stringResource(R.string.filter_date_title),
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
     )
@@ -158,17 +168,18 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
         modifier = Modifier.padding(top = 15.dp, bottom = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        DatePickerButton(title = stringResource(R.string.filter_startDate_title), buttonText = facturaListFilterViewModel.state.fechaInicio
+        DatePickerButton(title = strings.value?.filterStartDateTitle ?: stringResource(R.string.filter_date_title), buttonText = facturaListFilterViewModel.state.fechaInicio
             ?: stringResource(R.string.filter_date_button_text), onClick = {
             openDialogFirstDate.value = true
         })
-        DatePickerButton(title = stringResource(R.string.filter_endDate_title), buttonText = facturaListFilterViewModel.state.fechaFin
+        DatePickerButton(title = strings.value?.filterEndDateTitle ?: stringResource(R.string.filter_endDate_title), buttonText = facturaListFilterViewModel.state.fechaFin
             ?: stringResource(R.string.filter_date_button_text), onClick = {
             openDialogSecondDate.value = true
         })
     }
     if (openDialogFirstDate.value) {
         FacturaDatePicker(
+            strings = strings,
             onDismissRequest = {
                 openDialogFirstDate.value = false
             },
@@ -181,6 +192,7 @@ fun SeccionFechas(facturaListFilterViewModel: FacturaListFilterViewModel) {
     }
     if (openDialogSecondDate.value) {
         FacturaDatePicker(
+            strings = strings,
             onDismissRequest = {
                 openDialogSecondDate.value = false
             },
@@ -214,8 +226,10 @@ fun DatePickerButton(title: String,buttonText : String,onClick: () -> Unit){
 
 @Composable
 fun SliderSection(facturaListFilterViewModel: FacturaListFilterViewModel) {
+    val strings = facturaListFilterViewModel.strings.collectAsState()
+
     Text(
-        text = stringResource(R.string.filter_importe_title),
+        text = strings.value?.filterImporteTitle ?: stringResource(R.string.filter_importe_title),
         fontWeight = FontWeight.Bold,
         fontSize = 16.sp,
     )
@@ -241,11 +255,13 @@ fun SliderSection(facturaListFilterViewModel: FacturaListFilterViewModel) {
 
 @Composable
 fun SeccionCheckBox(facturaListFilterViewModel: FacturaListFilterViewModel) {
+    val strings = facturaListFilterViewModel.strings.collectAsState()
+
     Box(
         modifier = Modifier.padding(vertical = 10.dp, horizontal = 15.dp)
     ) {
         Text(
-            text = stringResource(R.string.filter_checkBox_title),
+            text = strings.value?.filterCheckBoxTitle ?: stringResource(R.string.filter_checkBox_title),
             fontWeight = FontWeight.Bold,
             fontSize = 16.sp,
         )
@@ -276,7 +292,7 @@ fun SeccionCheckBox(facturaListFilterViewModel: FacturaListFilterViewModel) {
                     disabledIndeterminateBorderColor = Color.Gray,
                 )
             )
-            Text(estadoFiltro.nombre)
+            Text(getFacturaStateName(estado = estadoFiltro.nombre, strings = strings))
         }
     }
 }
@@ -287,6 +303,8 @@ fun SeccionBotones(
     sharedViewModel: FacturaSharedViewModel,
     goBack: () -> Unit
 ) {
+    val strings = facturaListFilterViewModel.strings.collectAsState()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -297,7 +315,7 @@ fun SeccionBotones(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             BaseButton(
-                text = stringResource(R.string.filter_applyButton_text),
+                text = strings.value?.filterApplyButtonText ?: stringResource(R.string.filter_applyButton_text),
                 colors = ButtonColors(
                     containerColor = colorResource(R.color.green_button),
                     contentColor = Color.White,
@@ -313,7 +331,7 @@ fun SeccionBotones(
                 modifier = Modifier.width(200.dp)
             )
             BaseButton(
-                text = stringResource(R.string.filter_resetButton_text),
+                text = strings.value?.filterResetButtonText ?: stringResource(R.string.filter_resetButton_text),
                 onClick = {
                     facturaListFilterViewModel.onFiltersReset(sharedViewModel)
                 },
@@ -332,6 +350,7 @@ fun SeccionBotones(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FacturaDatePicker(
+    strings : State<AppStrings?>,
     onDismissRequest: () -> Unit,
     onClick: () -> Unit,
     datePickerState: DatePickerState
@@ -341,7 +360,7 @@ fun FacturaDatePicker(
         confirmButton = {
             BaseButton(
                 onClick = onClick,
-                text = stringResource(R.string.filter_popUp_confirm_text),
+                text = strings.value?.filterPopUpConfirmText ?: stringResource(R.string.filter_popUp_confirm_text),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(R.color.green_button)
                 )

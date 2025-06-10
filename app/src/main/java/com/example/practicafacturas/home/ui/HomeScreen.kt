@@ -19,7 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -30,6 +30,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.practicafacturas.R
 import com.example.practicafacturas.home.usecase.HomeScreenViewModel
+import com.example.ui.base.composables.BaseButton
 
 @Composable
 fun HomeScreen(
@@ -70,8 +72,12 @@ fun HomeScreenBody(
     onNavigateToSmartSolar: () -> Unit,
     modifier: Modifier
 ) {
-    val snackBarMessages : List<String> = listOf(stringResource(R.string.snackbar_usingMock_message),
-        stringResource(R.string.snackbar_usingApi_message)
+    val strings = homeScreenViewModel.strings.collectAsState()
+
+    val snackBarMessages: List<String> = listOf(
+        strings.value?.snackbarUsingMockMessage
+            ?: stringResource(R.string.snackbar_usingMock_message),
+        strings.value?.snackbarUsingApiMessage ?: stringResource(R.string.snackbar_usingApi_message)
     )
     Column(
         modifier = modifier
@@ -82,12 +88,12 @@ fun HomeScreenBody(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = stringResource(R.string.homeScreen_title),
+            text = strings.value?.homeScreenTitle ?: stringResource(R.string.homeScreen_title),
             fontWeight = FontWeight.Bold,
             fontSize = 40.sp,
             modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
         )
-        Image(painter = painterResource(R.drawable.logoiberdrola),contentDescription = null)
+        Image(painter = painterResource(R.drawable.logoiberdrola), contentDescription = null)
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = Modifier
@@ -99,7 +105,8 @@ fun HomeScreenBody(
         ) {
             item {
                 HomeCard(
-                    title = stringResource(R.string.homeScreen_facturasCard_title),
+                    title = strings.value?.homeScreenFacturasCardTitle
+                        ?: stringResource(R.string.homeScreen_facturasCard_title),
                     icon = Icons.AutoMirrored.Filled.List,
                     onClick = {
                         onNavigateToFacturas(homeScreenViewModel.useMockData)
@@ -108,15 +115,18 @@ fun HomeScreenBody(
             }
             item {
                 HomeCard(
-                    title = stringResource(R.string.homeScreen_smartSolarCard_title),
+                    title = strings.value?.homeScreenSmartSolarCardTitle
+                        ?: stringResource(R.string.homeScreen_smartSolarCard_title),
                     icon = Icons.Filled.Star,
                     onClick = onNavigateToSmartSolar
                 )
             }
         }
-        Text(text = if (homeScreenViewModel.useMockData) stringResource(R.string.switch_useMockData_affirmativeText) else stringResource(
-            R.string.switch_useMockData_negativeText
-        ))
+        Text(
+            text = if (homeScreenViewModel.useMockData) strings.value?.switchUseMockDataAffirmativeText
+                ?: stringResource(R.string.switch_useMockData_affirmativeText) else strings.value?.switchUseMockDataNegativeText
+                ?: stringResource(R.string.switch_useMockData_negativeText)
+        )
         Switch(
             checked = homeScreenViewModel.useMockData,
             onCheckedChange = { value ->
@@ -142,13 +152,15 @@ fun HomeScreenBody(
                 disabledUncheckedIconColor = Color.Black
             )
         )
-        Button(
+        BaseButton(
+            text = strings.value?.crashButtonText ?: stringResource(R.string.crash_button_text),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colorResource(R.color.green_button)
+            ),
             onClick = {
                 throw RuntimeException("Crash de prueba")
             }
-        ) {
-            Text("Kaboom")
-        }
+        )
     }
 }
 
