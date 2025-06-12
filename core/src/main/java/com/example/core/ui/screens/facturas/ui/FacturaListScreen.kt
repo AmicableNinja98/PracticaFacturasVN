@@ -244,7 +244,7 @@ fun FacturaLineChart(dataMap: Map<String, Number>,indicatorProperties: Horizonta
                 color = SolidColor(Color.Green)
             ))
         },
-        indicatorProperties = indicatorProperties,
+        indicatorProperties = indicatorProperties,  
         labelProperties = labelProperties,
         dotsProperties = DotProperties(
             enabled = true,

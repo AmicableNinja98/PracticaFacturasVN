@@ -17,4 +17,3 @@ build
 .kotlin
 htmlReport
 local.properties
-app/google-services.json
