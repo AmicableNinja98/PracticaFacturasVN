@@ -31,7 +31,9 @@ class FacturaListViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            strings.value = appStringsRepository.getAppStrings()
+            appStringsRepository.getAppStrings().collect {
+                strings.value = it
+            }
             resetData()
 
             val value = RemoteConfigManager.getShowGraph()
