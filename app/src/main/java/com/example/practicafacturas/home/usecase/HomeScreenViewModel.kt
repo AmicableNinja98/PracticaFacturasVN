@@ -34,7 +34,9 @@ class HomeScreenViewModel @Inject constructor(private val appStringsRepository: 
 
     init {
         viewModelScope.launch {
-            strings.value = appStringsRepository.getAppStrings()
+            appStringsRepository.getAppStrings().collect {
+                strings.value = it
+            }
         }
     }
 }

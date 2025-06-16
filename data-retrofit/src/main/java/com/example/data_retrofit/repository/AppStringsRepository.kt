@@ -3,8 +3,13 @@ package com.example.data_retrofit.repository
 import android.content.Context
 import com.example.domain.appstrings.AppStrings
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import java.util.Locale
 import javax.inject.Inject
@@ -15,24 +20,71 @@ class AppStringsRepository @Inject constructor(
 ) {
     private var cachedStrings : AppStrings? = null
 
-    suspend fun getAppStrings() : AppStrings{
-        if(cachedStrings != null) return cachedStrings!!
+    fun getAppStrings() : Flow<AppStrings>{
+        /*if(cachedStrings != null) return cachedStrings!!
 
         return try {
-            val stringsFirestore = loadStringsFromFirestore()
-            cachedStrings = stringsFirestore
-            stringsFirestore
+            loadStringsFromFirestore().collect {
+                strings ->
+                cachedStrings = strings
+            }
+            if(cachedStrings != null)
+                cachedStrings!!
+            else{
+                val jsonStrings = loadFromJson()
+                cachedStrings = jsonStrings
+                jsonStrings
+            }
+
         }catch (_ : Exception){
             val backUp = loadFromJson()
             cachedStrings = backUp
             backUp
+        }*/
+        return channelFlow {
+            val firestoreFlow = loadStringsFromFirestore()
+
+            val task = launch{
+                firestoreFlow.collect { firestoreStrings ->
+                    // Si alguno de los campos está vacío, asumimos que no hay datos en la base de datos.
+                    if (firestoreStrings.filterStartDateTitle != "") {
+                        cachedStrings = firestoreStrings
+                        send(firestoreStrings)
+                    } else {
+                        if (cachedStrings == null) {
+                            val backup = loadFromJson()
+                            cachedStrings = backup
+                            send(backup)
+                        }
+                    }
+                }
+            }
+
+            awaitClose{
+                task.cancel()
+            }
         }
     }
 
-    private suspend fun loadStringsFromFirestore() : AppStrings{
-        val snapshot = firestore.collection("appstrings").document("appstrings_${Locale.getDefault().language}").get().await()
+    private fun loadStringsFromFirestore() : Flow<AppStrings>{
+        return callbackFlow {
+            val docRef = firestore.collection("appstrings").document("appstrings_${Locale.getDefault().language}")
 
-        return snapshot.toObject(AppStrings::class.java) ?: throw IllegalStateException("Firestore returned null")
+            val listener : ListenerRegistration = docRef.addSnapshotListener { snapshot, error ->
+                if(error != null){
+                    close(error)
+                    return@addSnapshotListener
+                }
+                val strings = snapshot?.toObject(AppStrings::class.java)
+                if(strings != null){
+                    trySend(strings).isSuccess
+                }
+            }
+
+            awaitClose{
+                listener.remove()
+            }
+        }
     }
 
     private fun loadFromJson() : AppStrings{

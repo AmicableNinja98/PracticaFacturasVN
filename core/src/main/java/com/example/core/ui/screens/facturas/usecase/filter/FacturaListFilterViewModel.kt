@@ -33,7 +33,9 @@ class FacturaListFilterViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            strings.value = appStringsRepository.getAppStrings()
+            appStringsRepository.getAppStrings().collect {
+                strings.value = it
+            }
         }
     }
 

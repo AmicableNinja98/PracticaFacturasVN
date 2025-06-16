@@ -115,8 +115,8 @@ fun HomeScreenBody(
             }
             item {
                 HomeCard(
-                    title = strings.value?.homeScreenSmartSolarCardTitle
-                        ?: stringResource(R.string.homeScreen_smartSolarCard_title),
+                    title = if(!strings.value?.homeScreenSmartSolarCardTitle.isNullOrEmpty()) strings.value?.homeScreenSmartSolarCardTitle ?: "" else
+                        stringResource(R.string.homeScreen_smartSolarCard_title),
                     icon = Icons.Filled.Star,
                     onClick = onNavigateToSmartSolar
                 )
